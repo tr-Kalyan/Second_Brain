@@ -2,13 +2,13 @@ import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 
 dotenv.config({path:"../../.env"})
-const dbURL:String | undefined = process.env.DB_URL
-console.log(dbURL)
+// const dbURL:String|undefined= process.env.DB_URL
+
 const dbConnect = () => {
-    mongoose.connect(`{dbURL}`).then(() => {
+    mongoose.connect(`${process.env.DB_URL}`).then(() => {
         console.log('connected successfully')
     }).catch((err) => {
-        console.log("Something went wrong",err)
+        console.log("Unable to connect to db",err)
     })
 }
 

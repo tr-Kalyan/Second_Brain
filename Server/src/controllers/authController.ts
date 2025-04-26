@@ -7,9 +7,9 @@ import cookieParser from 'cookie-parser';
 
 dotenv.config({path:"../../.env"})
 
-const secretKey = process.env.JWT_KEY;
 
-export const registration = async (req:Request,res:Response) => {
+
+export const registration = async (req:Request,res:Response): Promise<void>  => {
     try{
         const {username,email,password} = req.body;
 
@@ -17,14 +17,16 @@ export const registration = async (req:Request,res:Response) => {
             res.status(400).json({
                 message:"All fields are required"
             })
+            return;
         }
 
         const checkEmail = await user.findOne({email})
 
         if (checkEmail){
-            return res.status(409).json({
+            res.status(409).json({
                 message:"Email already exist"
             })
+            return;
         }
 
         //hashing password
@@ -43,44 +45,48 @@ export const registration = async (req:Request,res:Response) => {
     }
     catch(err){
         
-        console.log("Something went wrong",err);
 
         res.status(500).send({
-        message : "Something went wrong while receving data"
+        message : `Something went wrong while registration ${err}`
         })
           return;
         
     }
 }
 
-export const login = async (req:Request,res:Response) => {
+export const login = async (req:Request,res:Response): Promise<void>  => {
     try{
         const {email,password} = req.body;
 
         //check whether all fields are filled or not
 
         if (!email || !password){
-            return res.status(400).json({
+            res.status(400).json({
                 message:"All fields are required"
             })
+            return;
         }
 
         const User = await user.findOne({email})
 
         if (!User || !User.password){
-            return res.status(404).json({
+            res.status(404).json({
                 message:"User not found or missing credentials"
             })
+            return;
         }
 
         const isMatch = await bcrypt.compare(password,User.password)
         
         if (!isMatch){
-            return res.status(401).json({
+            res.status(401).json({
                 message:"Invalid credentials"
             })
+            return
         }
 
+        const secretKey = process.env.JWT_KEY;
+        
         if (!secretKey){
             throw new Error('Value not available')
         }
@@ -97,14 +103,12 @@ export const login = async (req:Request,res:Response) => {
 
         res.status(200).json({
             message:"Login successful",
-            token:token,
             userID:User._id
         })
     }
     catch(err){
-        console.log("something wrong",err);
         res.status(500).json({
-        message: "Something went wrong"
+        message: `Something went wrong during signin ${err}`
         })
     }
 }
