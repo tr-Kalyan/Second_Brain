@@ -1,9 +1,11 @@
 import jwt from 'jsonwebtoken'
 import bcrypt from 'bcrypt'
-import user from "../models/userModel"
+import userModel,{UserDocument} from "../models/userModel"
+import { AuthenticatedRequest } from '../middleware/authMiddleware'
 import {Request,Response} from "express"
 import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
+import transporter from '../config/nodemailer';
 
 dotenv.config({path:"../../.env"})
 
@@ -20,7 +22,7 @@ export const registration = async (req:Request,res:Response): Promise<void>  => 
             return;
         }
 
-        const checkEmail = await user.findOne({email})
+        const checkEmail = await userModel.findOne({email})
 
         if (checkEmail){
             res.status(409).json({
@@ -30,14 +32,33 @@ export const registration = async (req:Request,res:Response): Promise<void>  => 
         }
 
         //hashing password
-        const hashPassword = await bcrypt.hash(password,5);
+        const hashPassword = await bcrypt.hash(password,10);
 
-        const newUser = new user({
+        const newUser = new userModel({
             username:username,
             email: email,
             password:hashPassword
         })
         await newUser.save();
+
+        //sending welcome email
+        const mailOptions = {
+            from:process.env.SENDER_EMAIL,
+            to:email,
+            subject:'Welcome to Second Brain',
+            text:`Hi ${username},
+
+            Thank you for signing up for Second Brain — your smart, organized space to save and manage everything that matters.
+
+            Your account has been successfully created using the email: ${email}.
+
+            Start capturing your ideas, saving useful links, and organizing your digital world, one thought at a time.
+
+            Cheers,  
+            The Second Brain Team`
+        }
+
+        await transporter.sendMail(mailOptions)
 
         res.status(201).json({
             message: "User successfully created"
@@ -47,7 +68,7 @@ export const registration = async (req:Request,res:Response): Promise<void>  => 
         
 
         res.status(500).send({
-        message : `Something went wrong while registration ${err}`
+        message : `Something went wrong while registration: ${err}`
         })
           return;
         
@@ -67,7 +88,7 @@ export const login = async (req:Request,res:Response): Promise<void>  => {
             return;
         }
 
-        const User = await user.findOne({email})
+        const User = await userModel.findOne({email})
 
         if (!User || !User.password){
             res.status(404).json({
@@ -109,6 +130,114 @@ export const login = async (req:Request,res:Response): Promise<void>  => {
     catch(err){
         res.status(500).json({
         message: `Something went wrong during signin ${err}`
+        })
+    }
+}
+
+export const logout = async(req:Request,res:Response):Promise<void> => {
+    try{
+        res.clearCookie('token',{
+            httpOnly:true,
+            secure:false,
+            sameSite:"lax",
+            path:"/"
+        })
+
+        res.status(200).json({
+            message:"Logout successful"
+        })
+        return;
+    }
+    catch(err){
+        res.status(500).json({
+            message:`something went wrong during logout ${err}`
+        })
+    }
+}
+
+//send verification OTP to the User's Email
+export const sendVerifyOtp = async(req:AuthenticatedRequest,res:Response):Promise<void> => {
+    try{
+        const userID = req.userID;
+
+        const user = await userModel.findById(userID)
+
+
+        if (!user) {
+            res.status(404).json({ message: "User not found" });
+            return;
+        }
+
+        if (user.isAccountVerified){
+            res.json({message:`Account already verified`})
+            return;
+        }
+
+        const otp = String(Math.floor(100000 + Math.random() * 900000))
+
+        user.verifyOtp = otp;
+        user.verifyOtpExpireAt = new Date(Date.now() + 120 * 1000);
+        await user.save(); 
+
+        const mailOptions = {
+            from:process.env.SENDER_EMAIL,
+            to:user.email as string,
+            subject:'Account verification OTP',
+            text:`Your account verification OTP is ${otp}. It will expire in 2 minutes`
+        }
+
+        await transporter.sendMail(mailOptions)
+
+        res.json({message:"Verification OTP sent on Email"})
+    }
+    catch(err){
+        res.status(500).json({
+            message:`something went wrong during OTP mail ${err}`
+        })
+    }
+}
+
+export const verifyEmail = async(req:AuthenticatedRequest,res:Response):Promise<void> => {
+    
+    const userID = req.userID;
+    const {otp} = req.body;
+    console.log(otp)
+    if (!userID || !otp){
+        res.json({message:'Missing details'})
+        return
+    }
+
+    try{
+        const user = await userModel.findById(userID) as UserDocument | null;;
+
+        if (!user){
+            res.status(400).json({message:"User not found"});
+            return
+        }
+
+        if (user.verifyOtp !== otp){
+            res.status(401).json({message:"Incorrect OTP"})
+            return;
+        }
+
+        if (!user.verifyOtpExpireAt || new Date() > user.verifyOtpExpireAt ){
+            res.status(410).json({
+                message:"OTP expired"
+            })
+            return
+        }
+
+        user.isAccountVerified = true;
+        user.verifyOtp = ""
+        user.verifyOtpExpireAt = null;
+
+        await user.save()
+
+        res.json({message:"Email verified successfully"})
+    }
+    catch(err){
+        res.status(500).json({
+            message:`something went wrong during email verification ${err}`
         })
     }
 }

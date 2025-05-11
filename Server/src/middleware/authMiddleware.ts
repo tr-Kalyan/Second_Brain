@@ -8,7 +8,7 @@ export interface AuthenticatedRequest extends Request{
 
 export const isAuthenticated = (req:AuthenticatedRequest,res:Response,next:NextFunction):void =>{
     try{
-        const token = req.cookies.token;
+        const {token} = req.cookies;
 
         
 
