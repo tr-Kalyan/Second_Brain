@@ -197,25 +197,27 @@ export const sendVerifyOtp = async(req:AuthenticatedRequest,res:Response):Promis
     }
 }
 
+
+//verify email using otp
 export const verifyEmail = async(req:AuthenticatedRequest,res:Response):Promise<void> => {
     
     const userID = req.userID;
     const {otp} = req.body;
-    console.log(otp)
+
     if (!userID || !otp){
         res.json({message:'Missing details'})
         return
     }
 
     try{
-        const user = await userModel.findById(userID) as UserDocument | null;;
+        const user = await userModel.findById(userID) as UserDocument | null;
 
         if (!user){
             res.status(400).json({message:"User not found"});
             return
         }
 
-        if (user.verifyOtp !== otp){
+        if (!user.verifyOtp || user.verifyOtp !== otp){
             res.status(401).json({message:"Incorrect OTP"})
             return;
         }
@@ -238,6 +240,103 @@ export const verifyEmail = async(req:AuthenticatedRequest,res:Response):Promise<
     catch(err){
         res.status(500).json({
             message:`something went wrong during email verification ${err}`
+        })
+    }
+}
+
+
+
+export const sendResetOtp = async(req:Request,res:Response):Promise<void> => {
+
+    const {email} = req.body;
+
+    if (!email){
+        res.status(404).json({message:"Email is required"})
+        return;
+    }
+
+    try{
+
+        const user = await userModel.findOne({email})
+
+        if (!user){
+            res.status(404).json({message:"User not found"})
+            return;
+        }
+
+        const otp = String(Math.floor(100000 + Math.random() * 900000))
+
+        //update otp and expire time 
+        user.resetOtp = otp;
+        user.resetOtpExpireAt = new Date(Date.now() + 5 * 60 * 1000) // reset otp expires after 5 minutes
+
+        //save the changes to the db
+        await user.save();
+
+        const mailOptions = {
+            from:process.env.SENDER_EMAIL,
+            to:email,
+            subject:'Account verification OTP',
+            text:`OTP for password reset is ${otp}. It will expire in 5 minutes. Use this OTP to proceed with resetting the password`
+        }
+
+        await transporter.sendMail(mailOptions)
+        
+        res.status(202).json({message:"Reset password otp sent successfully"})
+
+    }
+    catch(err){
+        res.status(500).json({
+            message:`something went wrong during reset password otp ${err}`
+        })
+    }
+}
+
+// Reset user password
+export const resetPassword = async(req:Request,res:Response):Promise<void> => {
+
+    const {email,otp,newPassword} = req.body;
+
+    if (!email || !otp || !newPassword){
+        res.status(404).json({
+            message:"All fields are mandatory"
+        })
+        return;
+    }
+
+    try{
+        const user = await userModel.findOne({email}) as UserDocument | null;
+
+        if (!user){
+            res.status(404).json({message:"User not found"})
+            return;
+        }
+
+        if (!user.resetOtp|| user.resetOtp !== otp){
+            res.status(401).json({message:"Incorrect OTP"})
+            return;
+        }
+
+        if (!user.resetOtpExpireAt || new Date() > user.resetOtpExpireAt){
+            res.status(410).json({
+                message:"OTP expired"
+            })
+            return
+        }
+
+        const hashedPassword = await bcrypt.hash(newPassword,10);
+        user.password = hashedPassword;
+        user.resetOtp = ""
+        user.resetOtpExpireAt = null;
+
+        await user.save()
+
+        res.status(200).json({message:"password reset successfull"})
+    }
+
+    catch(err){
+        res.status(500).json({
+            message:`something went wrong during reset password process ${err}`
         })
     }
 }

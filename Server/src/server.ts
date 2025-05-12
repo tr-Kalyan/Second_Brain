@@ -2,7 +2,8 @@ import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
-import authRouter from "./routes/pageRoutes"
+import authRouter from "./routes/authRoutes"
+import pageRouter from './routes/pageRoutes';
 import dbConnect from './config/db';
 
 const app = express();
@@ -18,7 +19,8 @@ dotenv.config({path:"../.env"});
 
 dbConnect()
 
-app.use("/api/v1",authRouter)
+app.use("/api/auth",authRouter)
+app.use("/api/user",pageRouter)
 
 
 // const port = process.env.PORT_NUMBER
