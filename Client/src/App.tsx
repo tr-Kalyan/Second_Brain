@@ -7,10 +7,13 @@ import Hero from './pages/Hero'
 import {LoginPage} from './pages/Login/LoginPage'
 import {Routes,Route} from 'react-router-dom'
 import ResetPassword from './pages/ResetPassword/ResetPassword'
+import {ToastContainer} from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 
 export default function App(){
   return(
     <div>
+      <ToastContainer />
       <Routes>
         <Route path="/" element={<Hero />} />
         <Route path="/login" element={<LoginPage />} />

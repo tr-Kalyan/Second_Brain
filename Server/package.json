@@ -30,4 +30,5 @@
     "@types/mongoose": "^5.11.96",
     "@types/nodemailer": "^6.4.17"
   }
+  
 }
