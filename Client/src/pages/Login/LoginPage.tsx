@@ -4,15 +4,17 @@ import { useNavigate } from 'react-router-dom';
 import { AppContent } from '../../context/AppContext';
 import axios from 'axios'
 import {toast} from 'react-toastify';
+import Icons from '../../assets/Icons'
 
 export const LoginPage = () => {
     const navigate = useNavigate();
-    const {backendURL, setIsLoggedIn, getUserData} = useContext(AppContent);
+    const {backendURL, setIsLoggedIn,userData, getUserData} = useContext(AppContent);
     const [state, setState] = useState('Sign in');
     const [username, setUsername] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [redirectToHome, setRedirectToHome] = useState(false);
 
     useEffect(() => {
         // Reset form state when toggling between Sign In and Sign Up
@@ -20,6 +22,13 @@ export const LoginPage = () => {
         setEmail("");
         setPassword("");
     }, [state]);
+
+    useEffect(() => {
+        if (redirectToHome) {
+            navigate("/");
+        }
+    }, [redirectToHome]);
+
 
     const handleSubmit = async(e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -43,7 +52,8 @@ export const LoginPage = () => {
                     // Then fetch user data
                     await getUserData();
                     // Then navigate
-                    navigate("/");
+                    // navigate("/");
+                    setRedirectToHome(true);
                 } else {
                     toast.error(response.data.message || "Signup failed");
                 }
@@ -52,6 +62,7 @@ export const LoginPage = () => {
                     email,
                     password
                 });
+                console.log("response from login function login page",response)
 
                 if (response.status === 200) {
                     toast.success(response.data.message || "Login successful");
@@ -60,7 +71,8 @@ export const LoginPage = () => {
                     // Then fetch user data
                     await getUserData();
                     // Then navigate
-                    navigate("/");
+                    // setTimeout(() => navigate("/"),100);
+                    setRedirectToHome(true);
                 } else {
                     toast.error(response.data.message || "Login failed");
                 }
@@ -76,10 +88,18 @@ export const LoginPage = () => {
     return (
         <div className="flex items-center justify-center min-h-screen sm:px-0 bg-gradient-to-r from-blue-200 to-black-200">
             <img onClick={() => navigate("/")} src={assets.logo} alt="" className="absolute left-5 sm:left:20 top-5 w-28 sm:w-32 cursor-pointer" />
+            
             <div className="bg-slate-900 p-10 rounded-lg shadow-lg w-full sm:w-96 text-indigo-300 text-sm">
                 <h2 className="text-3xl font-semibold text-white text-center mb-3">{state === 'Sign Up'? 'Create Account':'Login' }</h2>
                 <p className="text-center text-sm mb-6">  {state === 'Sign Up'? 'Create your account':'Login to your account!' }</p>
-
+                <div className="flex items-center flex-wrap">
+                    <Icons.YoutubeIcon className="w-8 h-8 text-red-600 hover:text-red-700" />
+                    <Icons.InstagramIcon className="w-9 h-9 text-red-600 hover:text-red-700" />
+                    <Icons.GithubIcon className="w-7 h-7 text-white  hover:text-red-700" />
+                    <Icons.DocIcon className="w-7 h-7 text-white  hover:text-red-700" />
+                    <Icons.Redditcon className="w-8 h-8 text-orange-500  hover:text-red-700" />
+                </div>
+                
                 <form onSubmit={handleSubmit}>
                     {state === 'Sign Up' && (
                         <div className="mb-4 flex items-center gap-3 w-full px-5 py-2.5 rounded-full bg-[#333A5C]">
@@ -117,7 +137,7 @@ export const LoginPage = () => {
                             required 
                         />
                     </div>
-                    <p onClick={() => navigate('/reset-password')} className="mb-4 text-indigo-500 cursor-pointer">Forgot password?</p>
+                    { state === "Sign in" && <p onClick={() => navigate('/reset-password')} className="mb-4 text-indigo-500 cursor-pointer">Forgot password?</p>}
                     <button 
                         className="w-full py-2.5 rounded-full bg-gradient-to-r from-indigo-500 to-teal-900 text-white font-medium"
                         disabled={isSubmitting}
