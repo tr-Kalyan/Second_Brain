@@ -17,7 +17,7 @@ interface AppContextType{
     getUserData: () => Promise<void>;
     loadingUserData: boolean; 
     setLoadingUserData: (value: boolean) => void;
-
+    logout:() => Promise<void>;
 }
 
 const defaultValue:AppContextType = {
@@ -29,12 +29,13 @@ const defaultValue:AppContextType = {
     getUserData: async () => {},
     loadingUserData: false,
     setLoadingUserData: () => {},
-
+    logout:async () => {},
 }
 
 export const AppContent = createContext<AppContextType>(defaultValue)
 
 export const AppContextProvider = ({children}:{children:ReactNode}) => {
+    
     const backendURL = import.meta.env.VITE_BACKEND_URL
     const [isLoggedIn, setIsLoggedIn] = useState(false)
     const [userData, setUserData] = useState<{
@@ -49,16 +50,19 @@ export const AppContextProvider = ({children}:{children:ReactNode}) => {
         const res = await axios.get(backendURL + '/api/auth/is-auth',{
             withCredentials:true
         })
-
+        console.log(res)
         if (res.status === 200){
             setIsLoggedIn(true)
-            getUserData()
+            await getUserData()
+        }
+        else {
+            setIsLoggedIn(false);
         }
 
 
     }
     catch(err){
-        toast.error("Authentication state went wrong")
+        setIsLoggedIn(false);
     }
 }
 
@@ -77,6 +81,7 @@ export const AppContextProvider = ({children}:{children:ReactNode}) => {
                     name: res.data.userData.name,
                     isAccountVerified: res.data.userData.isAccountVerified
                 }
+                setLoadingUserData(false)
                 setUserData(user);
                 setIsLoggedIn(true);
             } else {
@@ -85,24 +90,29 @@ export const AppContextProvider = ({children}:{children:ReactNode}) => {
                 
             }
         } catch(err) {
-            toast.error("Error fetching user data");
             setIsLoggedIn(false);
-            setUserData(null);
-            
         } 
     }
 
     // Add logout function
-    
+    const logout = async() => {
+            try {
+                await axios.post(`${backendURL}/api/auth/logout`, {}, {
+                    withCredentials: true
+                });
+                setIsLoggedIn(false);
+                setUserData(null);
+                toast.success("Logged out")
+            } catch(err) {
+                console.error("Error during logout:", err);
+            }
+    }
 
     useEffect(() => {
-        // Check authentication status on mount
-        const checkAuth = async () => {
-            await getUserData();
-        };
-        
-        checkAuth();
-    }, []);
+        if (isLoggedIn) {
+            getUserData();
+        }
+    }, [isLoggedIn]);
 
     useEffect(()=>{
         getAuthState()
@@ -117,7 +127,7 @@ export const AppContextProvider = ({children}:{children:ReactNode}) => {
         getUserData,
         loadingUserData, 
         setLoadingUserData,
-        
+        logout  
     }
     
     return (

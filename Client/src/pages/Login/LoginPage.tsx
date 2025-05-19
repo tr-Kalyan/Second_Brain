@@ -4,11 +4,11 @@ import { useNavigate } from 'react-router-dom';
 import { AppContent } from '../../context/AppContext';
 import axios from 'axios'
 import {toast} from 'react-toastify';
-import Icons from '../../assets/Icons'
+
 
 export const LoginPage = () => {
     const navigate = useNavigate();
-    const {backendURL, setIsLoggedIn,userData, getUserData} = useContext(AppContent);
+    const {backendURL, setIsLoggedIn, getUserData} = useContext(AppContent);
     const [state, setState] = useState('Sign in');
     const [username, setUsername] = useState("");
     const [email, setEmail] = useState("");
@@ -25,7 +25,7 @@ export const LoginPage = () => {
 
     useEffect(() => {
         if (redirectToHome) {
-            navigate("/");
+            navigate("/dashboard");
         }
     }, [redirectToHome]);
 
@@ -91,15 +91,7 @@ export const LoginPage = () => {
             
             <div className="bg-slate-900 p-10 rounded-lg shadow-lg w-full sm:w-96 text-indigo-300 text-sm">
                 <h2 className="text-3xl font-semibold text-white text-center mb-3">{state === 'Sign Up'? 'Create Account':'Login' }</h2>
-                <p className="text-center text-sm mb-6">  {state === 'Sign Up'? 'Create your account':'Login to your account!' }</p>
-                <div className="flex items-center flex-wrap">
-                    <Icons.YoutubeIcon className="w-8 h-8 text-red-600 hover:text-red-700" />
-                    <Icons.InstagramIcon className="w-9 h-9 text-red-600 hover:text-red-700" />
-                    <Icons.GithubIcon className="w-7 h-7 text-white  hover:text-red-700" />
-                    <Icons.DocIcon className="w-7 h-7 text-white  hover:text-red-700" />
-                    <Icons.Redditcon className="w-8 h-8 text-orange-500  hover:text-red-700" />
-                </div>
-                
+                <p className="text-center text-sm mb-6">  {state === 'Sign Up'? 'Create your account':'Login to your account!' }</p>                
                 <form onSubmit={handleSubmit}>
                     {state === 'Sign Up' && (
                         <div className="mb-4 flex items-center gap-3 w-full px-5 py-2.5 rounded-full bg-[#333A5C]">

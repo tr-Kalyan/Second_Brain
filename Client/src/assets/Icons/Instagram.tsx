@@ -22,6 +22,8 @@ const InstagramIcon = ({ className = "" }: { className?: string }) => (
     xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 24 24"
     fill="none"
+    width="30"
+    height="30"
     stroke="url(#instaGradient)"
     strokeWidth="2"
     strokeLinecap="round"

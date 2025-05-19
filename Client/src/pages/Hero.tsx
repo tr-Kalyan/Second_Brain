@@ -1,11 +1,14 @@
-import HeroNavbar from "../components/HeroNavbar/HeroNavbar"
-import Header from "../components/Header/Header"
+
+import { useNavigate} from 'react-router-dom'
+import {assets} from '../assets/assets'
 
 const Hero = () => {
+
+    const navigate = useNavigate();
     return(
-        <div className="flex items-center justify-center flex-col min-h-screen bg-[url('/bg_img.png')] bg-cover bg-center">
-            <HeroNavbar />
-            <Header />
+        <div className="">
+            <button onClick={() => navigate("/")}>Login <span>{assets.arrow_icon}</span></button>
+            
         </div>
     )
 }
