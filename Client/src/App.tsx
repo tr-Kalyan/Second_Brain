@@ -11,6 +11,7 @@ import {ToastContainer} from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import ProtectedRoute from './pages/ProtectedRoute'
 import Sidebar from './components/Sidebar/Sidebar'
+import Main from './components/Main/main'
 
 export default function App(){
   return(
@@ -24,7 +25,11 @@ export default function App(){
           path="/dashboard" 
           element={
             <ProtectedRoute>
-              <Sidebar />
+              <div className="flex">
+                <Sidebar />
+                <Main />
+              </div>
+              
             </ProtectedRoute>
           } 
         />

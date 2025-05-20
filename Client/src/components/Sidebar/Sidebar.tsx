@@ -7,7 +7,11 @@ import { IoLogoYoutube } from "react-icons/io";
 import { FaXTwitter } from "react-icons/fa6";
 import { SiMedium,SiNotion } from "react-icons/si";
 import { SlDocs } from "react-icons/sl";
+import { AiOutlineLogout } from "react-icons/ai";
+import { VscUnverified } from "react-icons/vsc";
 import { AppContent } from '../../context/AppContext';
+import axios from 'axios';
+import {toast} from 'react-toastify';
 
 
 const menuItems = [
@@ -44,7 +48,24 @@ export default function Sidebar() {
 
     const [open,setOpen] = useState(true)
 
-    const {userData,logout} = useContext(AppContent)
+    const {userData,backendURL,logout} = useContext(AppContent)
+
+    const sendVerificationOtp = async () =>{
+        try{
+            axios.defaults.withCredentials = true;
+
+            const res = await axios.post(backendURL + '/api/auth/send-verify-otp')
+
+            console.log(res)
+            if (res.status===200){
+                toast.success(res.data.message)
+                navigate("/email-verify")
+            }
+        }
+        catch(err){
+            console.log(`Error in email verification process: ${err}`)
+        }
+    }
 
     const handleLogout = async () => {
         await logout()
@@ -75,7 +96,7 @@ export default function Sidebar() {
                                     className={`
                                         transition-all duration-500 overflow-hidden
                                         ${open ? 'max-w-xs opacity-100 scale-100 ml-0' : 'max-w-0 opacity-0 scale-95 ml-6'}
-                                        whitespace-nowrap
+                                        whitespace-nowrap 
                                     `}
                                 >
                                     {item.label}
@@ -102,15 +123,15 @@ export default function Sidebar() {
                     {/* Dropdown */}
                     <div className="absolute bottom-8 left-0 mt-2 z-10 w-40 bg-white shadow-md rounded-md py-2 text-sm text-black hidden group-hover:block transition-opacity duration-200 opacity-0 group-hover:opacity-100">
                     <ul>
-                        {userData?.isAccountVerified && <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Verify Email</li>}
-                        <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer" onClick={handleLogout}>Logout</li>
+                        {!userData?.isAccountVerified && <li className="flex gap-2 px-4 py-2 hover:bg-gray-200 cursor-pointer" onClick={sendVerificationOtp}><span><VscUnverified size={20} /></span>Verify Email</li>}
+                        <li className="flex gap-2 px-4 py-2 hover:bg-gray-100 cursor-pointer" onClick={handleLogout}><span><AiOutlineLogout size={20} /></span>Logout</li>
                     </ul>
                     </div>
                 </div>
 
                 {/* Name & Email */}
                 <div className={`leading-5 transition-all duration-500 ${!open && 'w-0 translate-x-24 overflow-hidden'}`}>
-                    <p className="py-1">{userData.name}</p>
+                    <p className="py-1 text-md">{userData?.name ? userData.name.charAt(0).toUpperCase() + userData.name.slice(1).toLowerCase() : ''}</p>
                     {/* <span className="text-xs block overflow-hidden text-ellipsis whitespace-nowrap max-w-[150px]">
                     kalyannism@gmail.com
                     </span> */}

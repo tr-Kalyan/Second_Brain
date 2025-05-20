@@ -235,7 +235,7 @@ export const verifyEmail = async(req:AuthenticatedRequest,res:Response):Promise<
 
         await user.save()
 
-        res.json({message:"Email verified successfully"})
+        res.status(200).json({message:"Email verified successfully"})
     }
     catch(err){
         res.status(500).json({

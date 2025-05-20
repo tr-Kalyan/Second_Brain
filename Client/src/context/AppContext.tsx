@@ -46,25 +46,25 @@ export const AppContextProvider = ({children}:{children:ReactNode}) => {
 
 
     const getAuthState = async () => {
-    try{
-        const res = await axios.get(backendURL + '/api/auth/is-auth',{
-            withCredentials:true
-        })
-        console.log(res)
-        if (res.status === 200){
-            setIsLoggedIn(true)
-            await getUserData()
+        try{
+            const res = await axios.get(backendURL + '/api/auth/is-auth',{
+                withCredentials:true
+            })
+            console.log(res)
+            if (res.status === 200){
+                setIsLoggedIn(true)
+                await getUserData()
+            }
+            else {
+                setIsLoggedIn(false);
+            }
+
+
         }
-        else {
+        catch(err){
             setIsLoggedIn(false);
         }
-
-
     }
-    catch(err){
-        setIsLoggedIn(false);
-    }
-}
 
 
     const getUserData = async() => {

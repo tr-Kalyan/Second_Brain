@@ -86,11 +86,17 @@ export const LoginPage = () => {
     };
 
     return (
-        <div className="flex items-center justify-center min-h-screen sm:px-0 bg-gradient-to-r from-blue-200 to-black-200">
-            <img onClick={() => navigate("/")} src={assets.logo} alt="" className="absolute left-5 sm:left:20 top-5 w-28 sm:w-32 cursor-pointer" />
-            
-            <div className="bg-slate-900 p-10 rounded-lg shadow-lg w-full sm:w-96 text-indigo-300 text-sm">
-                <h2 className="text-3xl font-semibold text-white text-center mb-3">{state === 'Sign Up'? 'Create Account':'Login' }</h2>
+        <div className="flex items-center justify-center min-h-screen sm:px-0 bg-gradient-to-br from-[#e0f7fa] via-[#ffffff] to-[#e0f2f1]">
+            {/* <img onClick={() => navigate("/")} src={assets.logo} alt="" className="absolute left-5 sm:left:20 top-5 w-28 sm:w-32 cursor-pointer" /> */}
+            <div 
+                className="
+                            absolute left-5 sm:left:20  top-5 
+                            w-46 sm:w-46 text-2xl font-semibold cursor-pointer">
+                            🧠  <span className="bg-gradient-to-r from-emerald-400 via-sky-500 to-red-600 
+                            bg-clip-text text-transparent">Second Brain</span>
+            </div>
+            <div className="bg-slate-900 p-10 rounded-lg shadow-lg w-92 sm:w-96 text-indigo-300 text-sm">
+                <h2 className="text-3xl font-semibold text-white text-center mb-3">{state === 'Sign Up'? 'Sign Up':'Sign In' }</h2>
                 <p className="text-center text-sm mb-6">  {state === 'Sign Up'? 'Create your account':'Login to your account!' }</p>                
                 <form onSubmit={handleSubmit}>
                     {state === 'Sign Up' && (
