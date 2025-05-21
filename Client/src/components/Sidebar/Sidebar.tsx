@@ -1,4 +1,4 @@
-import {useState,useContext} from 'react'
+import {useState,useContext,useEffect} from 'react'
 import { useNavigate } from 'react-router-dom';
 import {MdMenuOpen} from "react-icons/md"
 import { LuBrainCircuit } from "react-icons/lu";
@@ -12,6 +12,7 @@ import { VscUnverified } from "react-icons/vsc";
 import { AppContent } from '../../context/AppContext';
 import axios from 'axios';
 import {toast} from 'react-toastify';
+
 
 
 const menuItems = [
@@ -47,6 +48,7 @@ export default function Sidebar() {
     const navigate = useNavigate()
 
     const [open,setOpen] = useState(true)
+    const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
     const {userData,backendURL,logout} = useContext(AppContent)
 
@@ -72,16 +74,29 @@ export default function Sidebar() {
         navigate('/login')
     }
 
+    useEffect(() => {
+        const handleResize = () => {
+            setIsMobile(window.innerWidth < 768);
+        };
+
+        window.addEventListener('resize', handleResize);
+        handleResize(); // run once on mount
+
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
     return (
-        <nav className={`shadow-md h-screen p-2 bg-emerald-200 duration-300 flex flex-col ${open ? 'w-50' : 'w-16'}`}>
+        <nav className={`shadow-md h-screen p-2 bg-cyan-200 duration-300 flex flex-col ${open && !isMobile ? 'w-50' : 'w-16'}`}>
 
             {/* header */}
 
-            <div className="flex justify-between items-center py-2 px-3 h-20">
-                {/* <img src={logo} alt="logo" className={`${open ? 'w-10' : 'w-0'} rounded-md } />*/}
-                <LuBrainCircuit size={30} className={`${open ? 'w-10' : 'w-0'}`} />
-                {/* <p className={`flex justify-center items-center bg-teal-600 rounded-[100%] ${open ? 'w-7' : 'w-0'}`} >K</p> */}
-                <div><MdMenuOpen size={30} className={` transition-all duration-500 cursor-pointer text-green-900 ${!open && ' rotate-180'}`} onClick={()=>setOpen(!open)} /></div>
+            <div className="flex items-center py-2  h-20 ">
+                
+                <div className="flex justify-start w-[50%]"><LuBrainCircuit size={30} className={` ${open && !isMobile  ? 'w-[50%]' : 'w-0'}`} /></div>
+
+                {/* <div className="flex justify-start"><img src={brain_ai} alt="" className={` ${open ? 'w-[50%]' : 'w-0'} bg-white`} /></div> */}
+                
+                <div className={`flex justify-end ${open ? 'w-[50%]' : 'w-full'} `}><MdMenuOpen size={30} className={` transition-all duration-500 cursor-pointer text-green-900 ${!open && ' rotate-180'}`} onClick={()=>setOpen(!open)} /></div>
             </div>
 
             {/* body */}
@@ -94,8 +109,8 @@ export default function Sidebar() {
                                 <div className="pr-2">{item.icons}</div>
                                 <p
                                     className={`
-                                        transition-all duration-500 overflow-hidden
-                                        ${open ? 'max-w-xs opacity-100 scale-100 ml-0' : 'max-w-0 opacity-0 scale-95 ml-6'}
+                                        transition-all duration-500 overflow-hidden 
+                                        ${open && !isMobile ? 'max-w-xs opacity-100 scale-100 ml-0' : 'max-w-0 opacity-0 scale-95 ml-6'}
                                         whitespace-nowrap 
                                     `}
                                 >
@@ -130,7 +145,7 @@ export default function Sidebar() {
                 </div>
 
                 {/* Name & Email */}
-                <div className={`leading-5 transition-all duration-500 ${!open && 'w-0 translate-x-24 overflow-hidden'}`}>
+                <div className={`leading-5 transition-all duration-500 ${!(open && !isMobile) && 'w-0 translate-x-24 overflow-hidden'}`}>
                     <p className="py-1 text-md">{userData?.name ? userData.name.charAt(0).toUpperCase() + userData.name.slice(1).toLowerCase() : ''}</p>
                     {/* <span className="text-xs block overflow-hidden text-ellipsis whitespace-nowrap max-w-[150px]">
                     kalyannism@gmail.com

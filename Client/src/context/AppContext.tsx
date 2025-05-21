@@ -57,12 +57,16 @@ export const AppContextProvider = ({children}:{children:ReactNode}) => {
             }
             else {
                 setIsLoggedIn(false);
+                setUserData(null);
+        setLoadingUserData(false);
             }
 
 
         }
         catch(err){
             setIsLoggedIn(false);
+            setUserData(null);
+        setLoadingUserData(false); 
         }
     }
 
@@ -81,7 +85,7 @@ export const AppContextProvider = ({children}:{children:ReactNode}) => {
                     name: res.data.userData.name,
                     isAccountVerified: res.data.userData.isAccountVerified
                 }
-                setLoadingUserData(false)
+                
                 setUserData(user);
                 setIsLoggedIn(true);
             } else {
@@ -90,8 +94,12 @@ export const AppContextProvider = ({children}:{children:ReactNode}) => {
                 
             }
         } catch(err) {
+            console.error('getUserData error - AppContent', err);
             setIsLoggedIn(false);
-        } 
+            setUserData(null)
+        }finally{
+            setLoadingUserData(false)
+        }
     }
 
     // Add logout function
@@ -108,11 +116,6 @@ export const AppContextProvider = ({children}:{children:ReactNode}) => {
             }
     }
 
-    useEffect(() => {
-        if (isLoggedIn) {
-            getUserData();
-        }
-    }, [isLoggedIn]);
 
     useEffect(()=>{
         getAuthState()
