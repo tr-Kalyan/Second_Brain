@@ -2,11 +2,11 @@ import {useState,useContext,useEffect} from 'react'
 import { useNavigate } from 'react-router-dom';
 import {MdMenuOpen} from "react-icons/md"
 import { LuBrainCircuit } from "react-icons/lu";
-import { FaUserCircle,FaFolderOpen} from "react-icons/fa";
+import { FaUserCircle,FaFolderOpen, FaLinkedin} from "react-icons/fa";
 import { IoLogoYoutube } from "react-icons/io";
 import { FaXTwitter } from "react-icons/fa6";
 import { SiMedium,SiNotion } from "react-icons/si";
-import { SlDocs } from "react-icons/sl";
+
 import { AiOutlineLogout } from "react-icons/ai";
 import { VscUnverified } from "react-icons/vsc";
 import { AppContent } from '../../context/AppContext';
@@ -33,8 +33,8 @@ const menuItems = [
         label:'Medium'
     },
     {
-        icons:<SlDocs size={24} />,
-        label:'Docs'
+        icons:<FaLinkedin className="text-blue-700" size={24} />,
+        label:'Linkedin'
     },
     {
         icons:<SiNotion size={24} />,
@@ -77,6 +77,11 @@ export default function Sidebar() {
     useEffect(() => {
         const handleResize = () => {
             setIsMobile(window.innerWidth < 768);
+            if (isMobile) {
+                setOpen(false)
+            } else {
+                setOpen(true)
+            }
         };
 
         window.addEventListener('resize', handleResize);
@@ -86,7 +91,7 @@ export default function Sidebar() {
     }, []);
 
     return (
-        <nav className={`shadow-md h-screen p-2 bg-cyan-200 duration-300 flex flex-col ${open && !isMobile ? 'w-50' : 'w-16'}`}>
+        <nav className={`shadow-md h-screen p-2 bg-gradient-to-b  from-orange-300 to-gray-500 duration-300 flex flex-col ${open && !isMobile ? 'w-50' : 'w-16'}`}>
 
             {/* header */}
 
@@ -105,7 +110,7 @@ export default function Sidebar() {
                 {
                     menuItems.map((item,index) => {
                         return (
-                            <li key={index} className="group flex gap-2 px-3 my-2 py-2 hover:bg-blue-500 rounded-md transition-all duration-300 cursor-pointer"> 
+                            <li key={index} className="group flex gap-2 px-3 my-2 py-2 hover:bg-slate-300 rounded-md transition-all duration-300 cursor-pointer"> 
                                 <div className="pr-2">{item.icons}</div>
                                 <p
                                     className={`
@@ -136,10 +141,10 @@ export default function Sidebar() {
                     <FaUserCircle size={32} />
 
                     {/* Dropdown */}
-                    <div className="absolute bottom-8 left-0 mt-2 z-10 w-40 bg-white shadow-md rounded-md py-2 text-sm text-black hidden group-hover:block transition-opacity duration-200 opacity-0 group-hover:opacity-100">
+                    <div className="absolute bottom-8 left-0 mt-2 z-10 w-40 bg-slate-700 shadow-md rounded-md  py-2 text-sm text-white hidden group-hover:block transition-opacity duration-200 opacity-0 group-hover:opacity-100">
                     <ul>
-                        {!userData?.isAccountVerified && <li className="flex gap-2 px-4 py-2 hover:bg-gray-200 cursor-pointer" onClick={sendVerificationOtp}><span><VscUnverified size={20} /></span>Verify Email</li>}
-                        <li className="flex gap-2 px-4 py-2 hover:bg-gray-100 cursor-pointer" onClick={handleLogout}><span><AiOutlineLogout size={20} /></span>Logout</li>
+                        {!userData?.isAccountVerified && <li className="flex gap-2 px-4 py-2 hover:bg-slate-200 hover:rounded-md hover:text-black cursor-pointer" onClick={sendVerificationOtp}><span><VscUnverified size={20} /></span>Verify Email</li>}
+                        <li className="flex gap-2 px-4 py-2 hover:bg-slate-200 hover:text-black hover:rounded-md cursor-pointer" onClick={handleLogout}><span><AiOutlineLogout size={20} /></span>Logout</li>
                     </ul>
                     </div>
                 </div>

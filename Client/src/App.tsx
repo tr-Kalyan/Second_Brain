@@ -16,7 +16,7 @@ import Main from './components/Main/main'
 export default function App(){
   return(
     <div>
-      <ToastContainer />
+      <ToastContainer autoClose={1000} theme="dark" />
       <Routes>
         
         <Route path="/login" element={<LoginPage />} />

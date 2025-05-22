@@ -5,11 +5,11 @@ import {Response} from "express"
 
 export const newContent = async (req:AuthenticatedRequest,res:Response):Promise<void> => {
     try{
-        const {link,contentType,title,tags} = req.body;
+        const {link,title,tags} = req.body;
 
         const userid = req.userID;
 
-        if (!link || !contentType || !title || !userid){
+        if (!link ||  !title || !userid){
             res.status(400).json({
                 message:"All fields are required"
             })
@@ -18,7 +18,6 @@ export const newContent = async (req:AuthenticatedRequest,res:Response):Promise<
 
         const contentCreated = new userContent({
             link:link,
-            contentType:contentType,
             title:title,
             tags:tags,
             userId:userid
