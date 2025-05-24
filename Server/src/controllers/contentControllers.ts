@@ -1,6 +1,12 @@
 import userContent from "../models/contentModel"
 import { AuthenticatedRequest } from "../middleware/authMiddleware"
-import {Response} from "express"
+import {Request,Response} from "express"
+import axios from 'axios';
+
+
+interface ThumbnailQuery {
+  url?: string;
+}
 
 
 export const newContent = async (req:AuthenticatedRequest,res:Response):Promise<void> => {
@@ -38,6 +44,24 @@ export const newContent = async (req:AuthenticatedRequest,res:Response):Promise<
     }
 }
 
+export const Thumbnail = async(req: Request<{}, {}, {}, ThumbnailQuery>,res:Response):Promise<void> => {
+    const {url} = req.query;
+    if (!url || typeof url !== 'string') {
+        res.status(400).json({ error: 'URL is required' });
+        return;
+    }
+
+    try {
+        const response = await axios.get(`https://api.microlink.io/?url=${encodeURIComponent(url)}`);
+        res.json(response.data);
+    } catch (err) {
+        console.error('Microlink fetch error:', err);
+        res.status(500).json({ error: 'Failed to fetch preview' });
+    }
+};
+
+
+
 export const content = async (req:AuthenticatedRequest,res:Response) => {
     try{
         const userid = req.userID;
@@ -53,7 +77,7 @@ export const content = async (req:AuthenticatedRequest,res:Response) => {
           message: "User data fetched successfully",
           data: userData,
         });
-        console.log(userData)
+        // console.log(userData)
       }catch(err){
         console.log("Err(catch): something went wrong",err)
         return;
@@ -63,24 +87,23 @@ export const content = async (req:AuthenticatedRequest,res:Response) => {
 export const deleteContent = async (req:AuthenticatedRequest,res:Response) => {
     try{
         const userid = req.userID;
-        const userTitle = req.params.contentId;
+        const contentId = req.params.contentId;
         
         console.log("userid =>", userid)
-        console.log("contentid =>", userTitle)
+        console.log("contentid =>", contentId)
 
-        if (!userid || !userTitle) {
+        if (!userid || !contentId) {
         res.status(400).json({ message: "User ID or Content ID missing" });
         return;
         }
 
-        const content = await userContent.findOne({ title: userTitle, userId: userid });
+        const deletedContent = await userContent.findOneAndDelete({ _id: contentId, userId: userid });
 
-        if (!content) {
-        res.status(404).json({ message: "Content not found or unauthorized" });
-        return;
+        if (!deletedContent) {
+            res.status(404).json({ message: "Content not found or unauthorized" });
+            return;
         }
 
-        await userContent.findByIdAndDelete(content);
 
         res.status(200).json({ message: "Content deleted successfully" });
     }
@@ -92,6 +115,46 @@ export const deleteContent = async (req:AuthenticatedRequest,res:Response) => {
         })
     }
 }
+
+
+export const editContent = async (req:AuthenticatedRequest,res:Response) => {
+    try{
+        const userId = req.userID;
+        const contentId = req.params.contentId;
+        const { title, link, tags } = req.body;
+
+        if (!userId || ! contentId){
+            res.status(400).json({
+                message:"User ID or Content ID missing"
+            })
+            return;
+        }
+
+        const updatedContent = await userContent.findOneAndUpdate(
+            {_id:contentId, userId:userId},
+            {title,link,tags},
+            {new:true}
+        )
+
+        if (!updatedContent){
+            res.status(404).json({
+                message:"Content notfound or unauthorized"
+            })
+            return;
+        }
+
+        res.status(200).json({
+            message:"Content updated successfully",
+            data:updatedContent
+        })
+    }
+    catch(err){
+        console.error("Error while updating content:", err);
+        res.status(500).json({ message: "Internal server error" });
+    }
+}
+
+
 
 export const shareContent = async (req:AuthenticatedRequest,res:Response) => {
     const {userId} = req.params;

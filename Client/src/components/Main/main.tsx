@@ -6,7 +6,16 @@ import type {KeyboardEvent, ChangeEvent} from 'react';
 import axios from 'axios';
 import { AppContent } from '../../context/AppContext';
 import {toast} from 'react-toastify';
+import Card from '../CardUI/Card';
 
+interface ContentItem {
+  _id: string;
+  title: string;
+  link: string;
+  thumbnailUrl:string;
+  tags: string[];
+  // optionally add: tags?: string[];
+}
 
 const Main: React.FC = () => {
 
@@ -17,6 +26,8 @@ const Main: React.FC = () => {
     const [link, setLink] = useState<string>('');
     const [tagInput, setTagInput] = useState<string>('');
     const [tags, setTags] = useState<string[]>([]);
+    const [content, setContent] = useState<ContentItem[]>([]);
+    const [category, setCategory] = useState<string>('');
 
     const handleAddTag = (e: KeyboardEvent<HTMLInputElement>) => {
         if (e.key === 'Enter' && tagInput.trim() !== '') {
@@ -32,22 +43,16 @@ const Main: React.FC = () => {
         setTags((prevTags) => prevTags.filter(tag => tag !== tagToRemove));
     };
 
-    // const handleSubmit = () => {
-    //     const content = { title, link, tags };
-    //     console.log('Submitted content:', content);
-
-    //     // Reset form
-    //     setTitle('');
-    //     setLink('');
-    //     setTags([]);
-    //     setShowModal(false);
-    // };
+    
 
     const handleSubmit = async () => {
 
         try{
+
             const res = await axios.post(backendURL + '/api/user/addContent', {link,title,tags})
+            
             console.log(res)
+            
             if (res.status === 200){
                 toast.success(res.data.message)
 
@@ -55,14 +60,73 @@ const Main: React.FC = () => {
                 setLink('');
                 setTags([]);
                 setShowModal(false);
-
             }
+
+            fetchData()
         }
         catch(err){
+
             console.log(`Error while adding new content ${err}`)
+
         }
 
     }
+
+    const fetchData = async () => {
+        try {
+            const res = await axios.get(`${backendURL}/api/user/content`, {
+            withCredentials: true,
+            });
+
+            if (res.status === 200) {
+                const contents = res.data.data;
+
+                // Fetch thumbnails in parallel
+                const contentWithThumbnails = await Promise.all(
+                    contents.map(async (item: any) => {
+                        try {
+                            const thumbRes = await axios.get(`${backendURL}/api/user/thumbnail`, {
+                            params: { url: item.link },
+                            withCredentials: true,
+                            });
+
+                            const thumbnailUrl = thumbRes.data?.data?.image?.url || null;
+
+                            return { ...item, thumbnailUrl };
+                        } catch (err) {
+                            console.error("Thumbnail fetch failed for", item.link);
+                            return { ...item, thumbnailUrl: null };
+                        }
+                    })
+                );
+
+                setContent(contentWithThumbnails);
+            }
+        } catch (err) {
+            console.log(`Error while fetching the data ${err}`);
+        }
+    };
+
+    const handleDelete = async(id:string) => {
+        try{
+            const res = await axios.delete(`${backendURL}/api/user/delete/${id}`,{
+                withCredentials:true
+            })
+            console.log(res)
+            if (res.status === 200 ){
+                toast.success(res.data.message)
+                setContent( prev => prev.filter(item => item._id !== id))
+            }
+        }
+        catch(err){
+            toast.error("Failed to delete content");
+            console.error("Error while deleting content:", err);
+        }
+    }
+
+    useEffect(() => {
+        fetchData()
+    },[])
 
     useEffect(() => {
         const handleClickOutside = (e: MouseEvent) => {
@@ -91,16 +155,18 @@ const Main: React.FC = () => {
             </button>
 
             {/* Three dots dropdown for small screens */}
-            <div className="md:hidden relative dropdown-container">
+            <div
+                onMouseEnter={() => setShowDropdown(true)}
+                onMouseLeave={() => setShowDropdown(false)}
+                className="md:hidden relative dropdown-container">
                 <button
-                    onClick={() => setShowDropdown(prev => !prev)}
-                    className="p-2"
+                    className="p-2 cursor-pointer"
                 >
                     <BsThreeDotsVertical size={20} />
                 </button>
 
                 {showDropdown && (
-                    <div className="absolute top-full right-0 mt-2 w-40 bg-white rounded-md shadow-lg z-50 border">
+                    <div className="absolute top-6 right-0 mt-2 w-40 bg-slate-700 shadow-md rounded-md  py-2 z-50 text-white hover:text-black">
                         <button
                             onClick={() => {
                             setShowModal(true);
@@ -121,8 +187,25 @@ const Main: React.FC = () => {
             </div>
         </div>
         
+        <div className="overflow-auto h-full px-4">
+            <div className="mt-4 grid grid-cols-2  md:grid-cols-3 lg:grid-cols-4 gap-6 p-4">
+                {content && content.map((item) => (
+                    <div key={item._id} >
+                        <Card 
+                            key={item._id} 
+                            title={item.title} 
+                            link={item.link} 
+                            tags={item.tags}
+                            thumbnailUrl={item.thumbnailUrl}
+                            onDelete = {() => handleDelete(item._id)}
+                        />
+                    </div>
+                ))}
+            </div>
+        </div>
+        
 
-        <div className="mt-4">Card view of links</div>
+        
 
         {/* Modal */}
         {showModal && (
@@ -180,10 +263,10 @@ const Main: React.FC = () => {
 
                 {/* Submit Button */}
                 <button
-                onClick={handleSubmit}
-                className="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600"
+                    onClick={handleSubmit}
+                    className="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600"
                 >
-                Submit
+                    Submit
                 </button>
             </div>
             </div>

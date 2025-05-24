@@ -1,87 +1,122 @@
-import { useState, useEffect } from "react";
-import { FiPlay } from "react-icons/fi";
+import React, { useEffect, useState } from "react";
+import { MdDelete, MdOutlineEdit } from "react-icons/md";
+import { BiExpand } from "react-icons/bi";
+import axios from "axios";
 
-const data = {
-  link: "https://www.youtube.com/watch?v=4XVvbZj794o",
-  contentType: "YouTube",
-  title: "How to land a job in tech",
-  tags: ["Job", "Resource"],
-};
+interface CardProps {
+  title: string;
+  link: string;
+  thumbnailUrl?: string | null;
+  onDelete: () => void;
+  tags: string[] | null;
+}
 
-const tag = data.tags;
-
-const Card = () => {
+const Card: React.FC<CardProps> = ({ title, link, onDelete, tags }) => {
   const [thumbnail, setThumbnail] = useState<string | null>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [videoId, setVideoId] = useState<string | null>(null);
+  const [showFullTitle, setShowFullTitle] = useState(false); // State for title tooltip
 
-  const getYouTubeId = (url: string): string | null => {
-    const regularFormat = url.split("v=");
-    if (regularFormat.length > 1) return regularFormat[1].split("&")[0];
-
-    const shortFormat = url.split("youtu.be/");
-    if (shortFormat.length > 1) return shortFormat[1].split("?")[0];
-
-    return null;
+  const fetchThumbnail = async (url: string) => {
+    try {
+      const response = await axios.get(`https://api.microlink.io/?url=${encodeURIComponent(url)}`);
+      const imageUrl = response.data?.data?.image?.url;
+      if (imageUrl) {
+        setThumbnail(imageUrl);
+      } else {
+        setThumbnail(null);
+      }
+    } catch (error) {
+      console.error("Error fetching thumbnail:", error);
+      setThumbnail(null);
+    }
   };
 
+  
+
   useEffect(() => {
-    const id = getYouTubeId(data.link);
-    if (id) {
-      setVideoId(id);
-      setThumbnail(`https://img.youtube.com/vi/${id}/hqdefault.jpg`);
-    }
-  }, []);
+    fetchThumbnail(link);
+  }, [link]);
 
   return (
-    <div style={{ maxWidth: "480px" }}>
-      <h3>{data.title}</h3>
+    <div className="w-full max-w-sm border border-gray-200 flex flex-col p-4 rounded-lg bg-white shadow-lg relative">
+      {/* Card Header with Title and Delete Button */}
+      <div className="flex justify-between items-start border-b border-gray-200 pb-3 mb-3">
+        {/* Title container with truncation and hover effect */}
+        <div
+          className="relative flex-grow pr-2"
+          onMouseEnter={() => setShowFullTitle(true)}
+          onMouseLeave={() => setShowFullTitle(false)}
+        >
+          <h1 className="text-lg font-semibold text-gray-800 line-clamp-2 h-[3.5rem]">
+            {title}
+          </h1>
 
-      <div style={{ position: "relative", cursor: "pointer" }}>
-        {!isPlaying && thumbnail && (
-          <>
-            <img
-              src={thumbnail}
-              alt="YouTube Thumbnail"
-              style={{ width: "80%", display: "block" }}
-              onClick={() => setIsPlaying(true)}
-            />
-            <div
-              onClick={() => setIsPlaying(true)}
-              style={{
-                position: "absolute",
-                top: "50%",
-                left: "50%",
-                transform: "translate(-100%, -30%)",
-                background: "rgba(0,0,0,0.7)",
-                borderRadius: "50%",
-                padding: "20px",
-              }}
-            >
-              <FiPlay size={30} color="white" />
+          {/* Tooltip for full title on hover */}
+          {showFullTitle && (
+            <div className="absolute z-10 -top-full left-0 right-0 p-2 bg-gray-800 text-white text-xs rounded-md shadow-lg opacity-95">
+              {title}
             </div>
-          </>
-        )}
-
-        {isPlaying && videoId && (
-          <iframe
-            width="100%"
-            height="270"
-            src={`https://www.youtube.com/embed/${videoId}?autoplay=1`}
-            frameBorder="0"
-            allow="autoplay; encrypted-media"
-            allowFullScreen
-            title="Embedded YouTube"
-          />
-        )}
+          )}
+        </div>
+        <div>
+          <BiExpand size={20} />
+        </div>
+        
       </div>
 
-      <div>
-        {tag.map((item, index) => (
-          <span key={index} style={{ marginRight: "5px" }}>
-            #{item}
-          </span>
-        ))}
+      {/* Thumbnail or Link Placeholder */}
+      {thumbnail ? (
+        <img
+          src={thumbnail}
+          alt="Preview"
+          className="w-full max-h-72 object-contain mx-auto rounded-md mb-3"
+        />
+      ) : (
+        <div className="flex-grow flex items-center justify-center h-48 bg-gray-100 rounded-md mb-3">
+          <p className="text-blue-600 underline break-all text-center p-2">
+            <a href={link} target="_blank" rel="noopener noreferrer">
+              {link}
+            </a>
+          </p>
+        </div>
+      )}
+
+      {/* Tags section with hover for full list */}
+      <div className="relative group">
+        {/* Tag container (1-line, overflow hidden, ellipsis) */}
+        <div className="flex items-center gap-2 overflow-hidden whitespace-nowrap text-ellipsis max-w-full">
+          {tags?.map((tag, index) => (
+            <span
+              key={index}
+              className="inline-block bg-orange-400 px-2 py-1 rounded-lg text-xs whitespace-nowrap"
+            >
+              #{tag}
+            </span>
+          ))}
+        </div>
+
+        {/* Full tag list on hover */}
+        <div className="absolute top-full left-0 z-10 mt-2 hidden group-hover:block bg-white border shadow-lg rounded-md p-2 max-w-xs w-fit">
+          <div className="flex flex-wrap gap-2">
+            {tags?.map((tag, index) => (
+              <span
+                key={index}
+                className="inline-block bg-orange-400 px-2 py-1 rounded-lg text-xs whitespace-nowrap"
+              >
+                #{tag}
+              </span>
+            ))}
+          </div>
+        </div>
+      </div>
+
+
+      {/* Edit Icon - Moved to be a direct child of the main card div, after all content */}
+      <div className="flex justify-end gap-3 pt-2">
+        <MdOutlineEdit className="text-xl cursor-pointer text-gray-600 hover:text-black" />
+        <button onClick={onDelete} className="flex-shrink-0">
+          <MdDelete className="text-xl cursor-pointer text-slate-700 hover:text-red-700" />
+        </button>
+        
       </div>
     </div>
   );

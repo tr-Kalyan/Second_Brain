@@ -25,7 +25,7 @@ export default function App(){
           path="/dashboard" 
           element={
             <ProtectedRoute>
-              <div className="flex">
+              <div className="flex h-screen overflow-hidden">
                 <Sidebar />
                 <Main />
               </div>
