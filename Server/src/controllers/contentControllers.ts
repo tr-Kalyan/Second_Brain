@@ -93,8 +93,8 @@ export const deleteContent = async (req:AuthenticatedRequest,res:Response) => {
         console.log("contentid =>", contentId)
 
         if (!userid || !contentId) {
-        res.status(400).json({ message: "User ID or Content ID missing" });
-        return;
+            res.status(400).json({ message: "User ID or Content ID missing" });
+            return;
         }
 
         const deletedContent = await userContent.findOneAndDelete({ _id: contentId, userId: userid });

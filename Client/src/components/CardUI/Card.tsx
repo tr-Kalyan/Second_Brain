@@ -8,10 +8,11 @@ interface CardProps {
   link: string;
   thumbnailUrl?: string | null;
   onDelete: () => void;
+  onEdit:() => void;
   tags: string[] | null;
 }
 
-const Card: React.FC<CardProps> = ({ title, link, onDelete, tags }) => {
+const Card: React.FC<CardProps> = ({ title, link, onDelete, tags, onEdit }) => {
   const [thumbnail, setThumbnail] = useState<string | null>(null);
   const [showFullTitle, setShowFullTitle] = useState(false); // State for title tooltip
 
@@ -37,27 +38,28 @@ const Card: React.FC<CardProps> = ({ title, link, onDelete, tags }) => {
   }, [link]);
 
   return (
-    <div className="w-full max-w-sm border border-gray-200 flex flex-col p-4 rounded-lg bg-white shadow-lg relative">
+    <div className="w-full border border-gray-200  p-4 rounded-lg bg-white shadow-lg relative">
       {/* Card Header with Title and Delete Button */}
-      <div className="flex justify-between items-start border-b border-gray-200 pb-3 mb-3">
+      <div className="flex justify-between items-start border-b border-gray-200 gap-1 pb-3 mb-3">
         {/* Title container with truncation and hover effect */}
         <div
-          className="relative flex-grow pr-2"
+          className="relative  pr-2 w-[80%]"
           onMouseEnter={() => setShowFullTitle(true)}
           onMouseLeave={() => setShowFullTitle(false)}
+          
         >
-          <h1 className="text-lg font-semibold text-gray-800 line-clamp-2 h-[3.5rem]">
+          <h1 className="text-lg font-semibold text-gray-800 line-clamp-2 h-[3.5rem] ">
             {title}
           </h1>
 
           {/* Tooltip for full title on hover */}
           {showFullTitle && (
-            <div className="absolute z-10 -top-full left-0 right-0 p-2 bg-gray-800 text-white text-xs rounded-md shadow-lg opacity-95">
+            <div className="absolute z-10 -top-10 left-0 right-0 p-2 bg-gray-800 text-white text-xs rounded-md shadow-lg opacity-95">
               {title}
             </div>
           )}
         </div>
-        <div>
+        <div className="flex justify-center items-end text-center py-1">
           <BiExpand size={20} />
         </div>
         
@@ -112,7 +114,7 @@ const Card: React.FC<CardProps> = ({ title, link, onDelete, tags }) => {
 
       {/* Edit Icon - Moved to be a direct child of the main card div, after all content */}
       <div className="flex justify-end gap-3 pt-2">
-        <MdOutlineEdit className="text-xl cursor-pointer text-gray-600 hover:text-black" />
+        <MdOutlineEdit className="text-xl cursor-pointer text-gray-600 hover:text-black" onClick={onEdit} />
         <button onClick={onDelete} className="flex-shrink-0">
           <MdDelete className="text-xl cursor-pointer text-slate-700 hover:text-red-700" />
         </button>

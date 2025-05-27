@@ -9,6 +9,6 @@ pageRouter.post("/addcontent",isAuthenticated,newContent)
 pageRouter.get("/thumbnail",isAuthenticated,Thumbnail)
 pageRouter.delete("/delete/:contentId",isAuthenticated,deleteContent)
 pageRouter.get("/share/:userId",isAuthenticated,shareContent)
-pageRouter.patch("/content/:contentId",isAuthenticated,editContent)
+pageRouter.put("/editcontent/:contentId",isAuthenticated,editContent)
 
 export default pageRouter;
