@@ -12,11 +12,17 @@ interface ContentItem {
   _id: string;
   title: string;
   link: string;
+  contentType:string;
   thumbnailUrl: string;
   tags: string[];
 }
 
-const Main: React.FC = () => {
+
+type MainProps = {
+  selectedMenu: string;
+};
+
+const Main: React.FC<MainProps> = ({ selectedMenu }) => {
   const { backendURL } = useContext(AppContent);
   const [showModal, setShowModal] = useState<boolean>(false);
   const [showDropdown, setShowDropdown] = useState(false);
@@ -73,7 +79,7 @@ const Main: React.FC = () => {
       setLink('');
       setTags([]);
       setShowModal(false);
-      fetchData();
+      await fetchData();
     } catch (err) {
       toast.error("Something went wrong");
       console.log(`Error in handleSubmit:`, err);
@@ -85,6 +91,8 @@ const Main: React.FC = () => {
       const res = await axios.get(`${backendURL}/api/user/content`, {
         withCredentials: true,
       });
+
+      console.log('from fetchdata',res.data.data)
 
       if (res.status === 200) {
         const contents = res.data.data;
@@ -159,7 +167,7 @@ const Main: React.FC = () => {
       {/* Top Buttons */}
       <div className="flex gap-3 justify-end">
         <button
-          className="hidden md:flex items-center gap-2 text-white px-2.5 py-1 bg-slate-700 text-sm rounded-md"
+          className="hidden cursor-pointer md:flex items-center gap-2 text-white px-2.5 py-1 bg-slate-700 text-sm rounded-md"
           onClick={() => {
             setShowModal(true);
             setEditMode(false);
@@ -171,7 +179,7 @@ const Main: React.FC = () => {
           <FaPlus size={14} /> <span>Add Content</span>
         </button>
 
-        <button className="hidden md:flex items-center gap-2 text-white px-2.5 py-1 bg-slate-700 rounded-md text-sm">
+        <button className="hidden cursor-pointer md:flex items-center gap-2 text-white px-2.5 py-1 bg-slate-700 rounded-md text-sm">
           <IoMdShare size={16} /> <span>Share Brain</span>
         </button>
 
@@ -217,15 +225,18 @@ const Main: React.FC = () => {
           <div
             className="grid gap-6 p-4"
             style={{
-              gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 300px))',
             }}
           >
-            {content && content.map((item) => (
+            {content && content
+            .filter((item) => selectedMenu === 'Show All' || item.contentType === selectedMenu)
+              .map((item) => (
               <Card
                 key={item._id}
                 title={item.title}
                 link={item.link}
                 tags={item.tags}
+                contentType={item.contentType}
                 thumbnailUrl={item.thumbnailUrl}
                 onDelete={() => handleDelete(item._id)}
                 onEdit={() => handleEdit(item)}

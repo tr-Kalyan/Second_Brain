@@ -2,17 +2,36 @@ import React, { useEffect, useState } from "react";
 import { MdDelete, MdOutlineEdit } from "react-icons/md";
 import { BiExpand } from "react-icons/bi";
 import axios from "axios";
+import {FaLinkedin, FaGithub,FaLink} from "react-icons/fa";
+import { IoLogoYoutube } from "react-icons/io";
+import { FaXTwitter } from "react-icons/fa6";
+import { SiMedium,SiNotion } from "react-icons/si";
+
+
+
+const contentTypeIcons: Record<string, React.ReactNode> = {
+  YouTube: <IoLogoYoutube size={20} className="text-red-600" />,
+  Medium: <SiMedium size={20} className="text-black" />,
+  Linkedin: <FaLinkedin size={20} className="text-blue-600" />,
+  Link: <FaLink size={20} className="text-purple-600" />,
+  Github:<FaGithub size={20} />,
+  Notion:<SiNotion size={20} />,
+  Twitter:<FaXTwitter size={18} />
+  // Add more if needed
+};
+
 
 interface CardProps {
   title: string;
   link: string;
+  contentType:string;
   thumbnailUrl?: string | null;
   onDelete: () => void;
   onEdit:() => void;
   tags: string[] | null;
 }
 
-const Card: React.FC<CardProps> = ({ title, link, onDelete, tags, onEdit }) => {
+const Card: React.FC<CardProps> = ({ title, link, onDelete, tags, onEdit,contentType }) => {
   const [thumbnail, setThumbnail] = useState<string | null>(null);
   const [showFullTitle, setShowFullTitle] = useState(false); // State for title tooltip
 
@@ -43,7 +62,7 @@ const Card: React.FC<CardProps> = ({ title, link, onDelete, tags, onEdit }) => {
       <div className="flex justify-between items-start border-b border-gray-200 gap-1 pb-3 mb-3">
         {/* Title container with truncation and hover effect */}
         <div
-          className="relative  pr-2 w-[80%]"
+          className="relative  pr-2 w-[90%]"
           onMouseEnter={() => setShowFullTitle(true)}
           onMouseLeave={() => setShowFullTitle(false)}
           
@@ -67,11 +86,13 @@ const Card: React.FC<CardProps> = ({ title, link, onDelete, tags, onEdit }) => {
 
       {/* Thumbnail or Link Placeholder */}
       {thumbnail ? (
-        <img
-          src={thumbnail}
-          alt="Preview"
-          className="w-full max-h-72 object-contain mx-auto rounded-md mb-3"
-        />
+        <a href={link} target="_blank" rel="noopener noreferrer">
+          <img
+            src={thumbnail}
+            alt="Preview"
+            className="w-full max-h-60 object-contain mx-auto rounded-md mb-3"
+          />
+      </a>
       ) : (
         <div className="flex-grow flex items-center justify-center h-48 bg-gray-100 rounded-md mb-3">
           <p className="text-blue-600 underline break-all text-center p-2">
@@ -112,9 +133,17 @@ const Card: React.FC<CardProps> = ({ title, link, onDelete, tags, onEdit }) => {
       </div>
 
 
-      {/* Edit Icon - Moved to be a direct child of the main card div, after all content */}
-      <div className="flex justify-end gap-3 pt-2">
-        <MdOutlineEdit className="text-xl cursor-pointer text-gray-600 hover:text-black" onClick={onEdit} />
+      {/* Edit Icon - Delete Icon */}
+      <div className="flex justify-end gap-3 pt-4">
+
+        <div className='flex items-center justify-start w-full'>
+          {contentTypeIcons[contentType] || <FaLink size={20} />}
+        </div>
+
+        <button onClick={onEdit}>
+          <MdOutlineEdit className="text-xl cursor-pointer text-gray-600 hover:text-black"  />
+        </button>
+
         <button onClick={onDelete} className="flex-shrink-0">
           <MdDelete className="text-xl cursor-pointer text-slate-700 hover:text-red-700" />
         </button>

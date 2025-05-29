@@ -2,7 +2,7 @@ import {useState,useContext,useEffect} from 'react'
 import { useNavigate } from 'react-router-dom';
 import {MdMenuOpen} from "react-icons/md"
 import { LuBrainCircuit } from "react-icons/lu";
-import { FaUserCircle,FaFolderOpen, FaLinkedin} from "react-icons/fa";
+import { FaUserCircle,FaFolderOpen, FaLinkedin, FaGithub} from "react-icons/fa";
 import { IoLogoYoutube } from "react-icons/io";
 import { FaXTwitter } from "react-icons/fa6";
 import { SiMedium,SiNotion } from "react-icons/si";
@@ -14,6 +14,10 @@ import axios from 'axios';
 import {toast} from 'react-toastify';
 
 
+type SidebarProps = {
+  selectedMenu: string;
+  setSelectedMenu: (label: string) => void;
+};
 
 const menuItems = [
     {
@@ -40,14 +44,19 @@ const menuItems = [
         icons:<SiNotion size={24} />,
         label:'Notion'
     },
+    {
+        icons:<FaGithub size={25} />,
+        label:'Github'
+    }
 
 ]
 
-export default function Sidebar() {
+export default function Sidebar({ selectedMenu, setSelectedMenu }:SidebarProps) {
 
     const navigate = useNavigate()
 
     const [open,setOpen] = useState(true)
+    
     const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
     const {userData,backendURL,logout} = useContext(AppContent)
@@ -97,7 +106,7 @@ export default function Sidebar() {
 
             <div className="flex items-center py-2  h-20 ">
                 
-                <div className="flex justify-start w-[50%]"><LuBrainCircuit size={30} className={` ${open && !isMobile  ? 'w-[50%]' : 'w-0'}`} /></div>
+                <div className="flex justify-start w-[50%]"><LuBrainCircuit size={30} className={` ${open && !isMobile  ? 'w-[50%]' : 'w-0'} `} /></div>
 
                 {/* <div className="flex justify-start"><img src={brain_ai} alt="" className={` ${open ? 'w-[50%]' : 'w-0'} bg-white`} /></div> */}
                 
@@ -110,7 +119,13 @@ export default function Sidebar() {
                 {
                     menuItems.map((item,index) => {
                         return (
-                            <li key={index} className="group flex gap-2 px-3 my-2 py-2 hover:bg-slate-300 rounded-md transition-all duration-300 cursor-pointer"> 
+                            <li 
+                                key={index} 
+                                onClick={() => setSelectedMenu(item.label)}
+                                className={`group flex gap-2 px-3 my-2 py-2 rounded-md transition-all duration-300 cursor-pointer
+                                    ${selectedMenu === item.label ? 'bg-slate-800 text-white': 'hover:bg-slate-500'}`}
+                                
+                            > 
                                 <div className="pr-2">{item.icons}</div>
                                 <p
                                     className={`

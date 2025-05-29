@@ -1,19 +1,17 @@
-// import ButtonUI from './components/ButtonUI/Button'
-// import PlusIcon from './components/Icons/PlusIcon'
-// import {RegisterPage} from './pages/Register/RegisterPage'
-// import Card from './components/CardUI/Card'
-import Emailverify from './pages/EmailVerify/EmailVerify'
-// import Hero from './pages/Hero'
-import {LoginPage} from './pages/Login/LoginPage'
-import {Routes,Route} from 'react-router-dom'
-import ResetPassword from './pages/ResetPassword/ResetPassword'
+import {useState} from 'react';
 import {ToastContainer} from 'react-toastify'
+import {Routes,Route} from 'react-router-dom'
+import Emailverify from './pages/EmailVerify/EmailVerify'
+import {LoginPage} from './pages/Login/LoginPage'
+import ResetPassword from './pages/ResetPassword/ResetPassword'
 import 'react-toastify/dist/ReactToastify.css'
 import ProtectedRoute from './pages/ProtectedRoute'
 import Sidebar from './components/Sidebar/Sidebar'
 import Main from './components/Main/main'
 
 export default function App(){
+
+  const [selectedMenu,setSelectedMenu] = useState<string>("Show All");
   return(
     <div>
       <ToastContainer autoClose={1000} theme="dark" />
@@ -26,9 +24,9 @@ export default function App(){
           element={
             <ProtectedRoute>
               <div className="flex h-screen overflow-hidden w-full">
-                <Sidebar />
+                <Sidebar selectedMenu={selectedMenu} setSelectedMenu={setSelectedMenu} />
 
-                <Main />
+                <Main selectedMenu={selectedMenu} />
               </div>
               
             </ProtectedRoute>

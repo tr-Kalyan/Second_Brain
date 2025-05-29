@@ -15,12 +15,12 @@ function detectContentType(link:string):string{
         const url = new URL(link);
         const host = url.hostname.toLowerCase();
 
-        if (host.includes("youtube.com") || host.includes("youtub.be")) return "Youtube"
+        if (host.includes("youtube.com") || host.includes("youtub.be")) return "YouTube"
         if (host.includes("medium.com")) return "Medium"
         if (host.includes("github.com")) return "Github"
         if (host.includes("linkedin.com")) return "Linkedin"
         if (host.includes("notion.so")) return "Notion";
-        if (host.includes("x.com") || host.includes("twitter.com")) return "X";
+        if (host.includes("x.com") || host.includes("twitter.com")) return "Twitter";
 
         return "Website";
     }                                                               
