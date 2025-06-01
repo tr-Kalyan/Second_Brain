@@ -106,7 +106,7 @@ export default function Sidebar({ selectedMenu, setSelectedMenu }:SidebarProps) 
 
             <div className="flex items-center py-2  h-20 ">
                 
-                <div className="flex justify-start w-[50%]"><LuBrainCircuit size={30} className={` ${open && !isMobile  ? 'w-[50%]' : 'w-0'} `} /></div>
+                <div className="flex justify-start w-[50%]" ><LuBrainCircuit size={30} className={` ${open && !isMobile  ? 'w-[50%]' : 'w-0'} `} /></div>
 
                 {/* <div className="flex justify-start"><img src={brain_ai} alt="" className={` ${open ? 'w-[50%]' : 'w-0'} bg-white`} /></div> */}
                 

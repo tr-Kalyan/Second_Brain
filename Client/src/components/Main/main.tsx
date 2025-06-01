@@ -13,7 +13,7 @@ interface ContentItem {
   title: string;
   link: string;
   contentType:string;
-  thumbnailUrl: string;
+  thumbnailUrl?: string;
   tags: string[];
 }
 
@@ -92,29 +92,12 @@ const Main: React.FC<MainProps> = ({ selectedMenu }) => {
         withCredentials: true,
       });
 
-      console.log('from fetchdata',res.data.data)
+      // console.log('from fetchdata',res.data.data)
 
       if (res.status === 200) {
-        const contents = res.data.data;
 
-        const contentWithThumbnails = await Promise.all(
-          contents.map(async (item: any) => {
-            try {
-              const thumbRes = await axios.get(`${backendURL}/api/user/thumbnail`, {
-                params: { url: item.link },
-                withCredentials: true,
-              });
+        setContent(res.data.data);
 
-              const thumbnailUrl = thumbRes.data?.data?.image?.url || null;
-              return { ...item, thumbnailUrl };
-            } catch (err) {
-              console.error("Thumbnail fetch failed for", item.link);
-              return { ...item, thumbnailUrl: null };
-            }
-          })
-        );
-
-        setContent(contentWithThumbnails);
       }
     } catch (err) {
       console.log("Error while fetching data:", err);
@@ -236,8 +219,8 @@ const Main: React.FC<MainProps> = ({ selectedMenu }) => {
                 title={item.title}
                 link={item.link}
                 tags={item.tags}
+                thumbnail = {item.thumbnailUrl}
                 contentType={item.contentType}
-                thumbnailUrl={item.thumbnailUrl}
                 onDelete={() => handleDelete(item._id)}
                 onEdit={() => handleEdit(item)}
               />

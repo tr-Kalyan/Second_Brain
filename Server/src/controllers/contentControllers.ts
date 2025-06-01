@@ -1,12 +1,10 @@
 import userContent from "../models/contentModel"
 import { AuthenticatedRequest } from "../middleware/authMiddleware"
 import {Request,Response} from "express"
-import axios from 'axios';
+import {getThumbnail} from '../utils/getThumbnails'
 
 
-interface ThumbnailQuery {
-  url?: string;
-}
+
 
 
 export const newContent = async (req:AuthenticatedRequest,res:Response):Promise<void> => {
@@ -22,17 +20,22 @@ export const newContent = async (req:AuthenticatedRequest,res:Response):Promise<
             return
         }
 
+        //generate thumbnail
+        const thumbnailUrl = await getThumbnail(link)
+
         const contentCreated = new userContent({
             link:link,
             title:title,
             tags:tags,
-            userId:userid
+            userId:userid,
+            thumbnailUrl:thumbnailUrl
         })
 
         await contentCreated.save()
 
         res.status(200).json({
-            message:"Content saved successfully"
+            message:"Content saved successfully",
+            data:contentCreated
         })
     }
     catch(err){
@@ -44,21 +47,7 @@ export const newContent = async (req:AuthenticatedRequest,res:Response):Promise<
     }
 }
 
-export const Thumbnail = async(req: Request<{}, {}, {}, ThumbnailQuery>,res:Response):Promise<void> => {
-    const {url} = req.query;
-    if (!url || typeof url !== 'string') {
-        res.status(400).json({ error: 'URL is required' });
-        return;
-    }
 
-    try {
-        const response = await axios.get(`https://api.microlink.io/?url=${encodeURIComponent(url)}`);
-        res.json(response.data);
-    } catch (err) {
-        console.error('Microlink fetch error:', err);
-        res.status(500).json({ error: 'Failed to fetch preview' });
-    }
-};
 
 
 
@@ -130,9 +119,13 @@ export const editContent = async (req:AuthenticatedRequest,res:Response) => {
             return;
         }
 
+
+        //create thumbnail if the link changes
+        const thumbnailUrl = await getThumbnail(link)
+
         const updatedContent = await userContent.findOneAndUpdate(
             {_id:contentId, userId:userId},
-            {title,link,tags},
+            {title,link,tags,thumbnailUrl},
             {new:true}
         )
 
@@ -156,16 +149,16 @@ export const editContent = async (req:AuthenticatedRequest,res:Response) => {
 
 
 
-export const shareContent = async (req:AuthenticatedRequest,res:Response) => {
-    const {userId} = req.params;
-    try{
-        const documents = await userContent.find({userId});
-        res.status(200).json({data:documents})
-    }
-    catch(err){
+// export const shareContent = async (req:AuthenticatedRequest,res:Response) => {
+//     const {userId} = req.params;
+//     try{
+//         const documents = await userContent.find({userId});
+//         res.status(200).json({data:documents})
+//     }
+//     catch(err){
 
-        console.log("Something went wrong while sharing",err)
+//         console.log("Something went wrong while sharing",err)
 
-        res.status(500).json({ message: 'Server error' });
-    }
-}
+//         res.status(500).json({ message: 'Server error' });
+//     }
+// }

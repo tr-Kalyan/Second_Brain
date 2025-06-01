@@ -5,7 +5,9 @@ const contentSchema = new mongoose.Schema({
     contentType:{type:String},
     title:{type:String,require:true},
     tags:[{type:String}],
-    userId:{type:Types.ObjectId,ref:'User',require:true}
+    userId:{type:Types.ObjectId,ref:'User',require:true},
+    thumbnailUrl:String,
+    createdAt:{type:Date, default:Date.now}
 })
 
 

@@ -37,11 +37,13 @@ export const LoginPage = () => {
         setIsSubmitting(true);
         try {
             axios.defaults.withCredentials = true;
-            
+
+            const lowerCaseEmail = email.trim().toLowerCase();
+
             if (state === 'Sign Up') {
                 const response = await axios.post(`${backendURL}/api/auth/signup`, {
                     username,
-                    email,
+                    lowerCaseEmail,
                     password
                 });
 
@@ -116,7 +118,7 @@ export const LoginPage = () => {
                     <div className="mb-4 flex items-center gap-3 w-full px-5 py-2.5 rounded-full bg-[#333A5C]">
                         <img src={assets.mail_icon} alt="person icon" />
                         <input 
-                            onChange={e => setEmail(e.target.value)} 
+                            onChange={e => setEmail(e.target.value.toLowerCase())} 
                             value={email}
                             className="w-full bg-transparent outline-none text-white" 
                             type="email" 
@@ -125,7 +127,7 @@ export const LoginPage = () => {
                         />
                     </div>
                     <div className="mb-4 flex items-center gap-3 w-full px-5 py-2.5 rounded-full bg-[#333A5C]">
-                        <img src={assets.lock_icon} alt="person icon" />
+                        <img src={assets.lock_icon} alt="lock icon" />
                         <input 
                             onChange={e => setPassword(e.target.value)} 
                             value={password}
