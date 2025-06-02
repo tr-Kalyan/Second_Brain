@@ -4,8 +4,8 @@ import { IoMdShare, IoMdClose } from 'react-icons/io';
 import { BsThreeDotsVertical } from "react-icons/bs";
 import type { KeyboardEvent, ChangeEvent } from 'react';
 import axios from 'axios';
-import { AppContent } from '../../context/AppContext';
-import { toast } from 'react-toastify';
+
+
 import Card from '../CardUI/Card';
 import ShareModal from './ShareModal';
 
@@ -25,7 +25,7 @@ type MainProps = {
 
 const Main: React.FC<MainProps> = ({ selectedMenu }) => {
 
-  const { backendURL } = useContext(AppContent);
+
   const [showModal, setShowModal] = useState<boolean>(false);
   const [showDropdown, setShowDropdown] = useState(false);
   const [title, setTitle] = useState<string>('');
@@ -48,116 +48,15 @@ const Main: React.FC<MainProps> = ({ selectedMenu }) => {
     }
   };
 
-  const handleRemoveTag = (tagToRemove: string) => {
-    setTags((prevTags) => prevTags.filter(tag => tag !== tagToRemove));
-  };
+  
 
-  const handleSubmit = async () => {
-    try {
-      if (editMode && editingId) {
-        const res = await axios.put(`${backendURL}/api/user/editcontent/${editingId}`, {
-          title,
-          link,
-          tags
-        },{withCredentials:true});
-        console.log(res)
-
-        if (res.status === 200) {
-          toast.success("Content updated successfully");
-          setEditMode(false);
-          setEditingId(null);
-        }
-      } else {
-        const res = await axios.post(`${backendURL}/api/user/addContent`, {
-          title,
-          link,
-          tags
-        },{withCredentials:true});
-
-        if (res.status === 200) {
-          toast.success(res.data.message);
-        }
-      }
-
-      setTitle('');
-      setLink('');
-      setTags([]);
-      setShowModal(false);
-      await fetchData();
-    } catch (err) {
-      toast.error("Something went wrong");
-      console.log(`Error in handleSubmit:`, err);
-    }
-  };
+  
 
 
-  const handleShare = async() =>{
-    try{
-      const res = await axios.post(`${backendURL}/api/user/generate-share-link`,{},{
-        withCredentials:true,
-      });
-      console.log("from handleShare",res)
-      if (res.status === 201){
-        const link = res.data.shareLink;
-
-        await navigator.clipboard.writeText(link);
-
-        setShareLink(link);
-        setShareShowModal(true);
-      }
 
 
-    }
-    catch(err){
-      console.error("Error generating share link:", err);
-    }
-  }
-  const fetchData = async () => {
-    try {
-      const res = await axios.get(`${backendURL}/api/user/content`, {
-        withCredentials: true,
-      });
 
-      // console.log('from fetchdata',res.data.data)
 
-      if (res.status === 200) {
-
-        setContent(res.data.data);
-
-      }
-    } catch (err) {
-      console.log("Error while fetching data:", err);
-    }
-  };
-
-  const handleEdit = (item: ContentItem) => {
-    setEditMode(true);
-    setEditingId(item._id);
-    setTitle(item.title);
-    setLink(item.link);
-    setTags(item.tags || []);
-    setShowModal(true);
-  };
-
-  const handleDelete = async (id: string) => {
-    try {
-      const res = await axios.delete(`${backendURL}/api/user/delete/${id}`, {
-        withCredentials: true
-      });
-
-      if (res.status === 200) {
-        toast.success(res.data.message);
-        setContent(prev => prev.filter(item => item._id !== id));
-      }
-    } catch (err) {
-      toast.error("Failed to delete content");
-      console.error("Delete error:", err);
-    }
-  };
-
-  useEffect(() => {
-    fetchData();
-  }, []);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -219,7 +118,7 @@ const Main: React.FC<MainProps> = ({ selectedMenu }) => {
               </button>
               <button
                 onClick={() => {
-                  handleShare()
+                  
                   setShowDropdown(false)}}
                 className="w-full flex items-center gap-2 px-4 py-2 hover:bg-gray-100 text-sm"
               >
@@ -260,8 +159,7 @@ const Main: React.FC<MainProps> = ({ selectedMenu }) => {
                 tags={item.tags}
                 thumbnail = {item.thumbnailUrl}
                 contentType={item.contentType}
-                onDelete={() => handleDelete(item._id)}
-                onEdit={() => handleEdit(item)}
+                
               />
             ))}
           </div>
