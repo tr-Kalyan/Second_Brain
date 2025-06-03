@@ -2,6 +2,7 @@ import React, { useState, useContext, useEffect } from 'react';
 import { FaPlus } from 'react-icons/fa';
 import { IoMdShare, IoMdClose } from 'react-icons/io';
 import { BsThreeDotsVertical } from "react-icons/bs";
+import { CiSearch } from "react-icons/ci";
 import type { KeyboardEvent, ChangeEvent } from 'react';
 import axios from 'axios';
 import { AppContent } from '../../context/AppContext';
@@ -37,6 +38,7 @@ const Main: React.FC<MainProps> = ({ selectedMenu }) => {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [shareLink,setShareLink] = useState<string>('');
   const [shareShowModal,setShareShowModal] = useState<boolean>(false);
+  const [search,setSearch] = useState<string>('')
 
   const handleAddTag = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && tagInput.trim() !== '') {
@@ -171,10 +173,34 @@ const Main: React.FC<MainProps> = ({ selectedMenu }) => {
     return () => document.removeEventListener('click', handleClickOutside);
   }, []);
 
+
+  // Content filtering
+  const filteredContent = content
+  .filter(item => selectedMenu === 'Show All' || item.contentType === selectedMenu)
+  .filter(item =>
+    item.title.toLowerCase().includes(search.toLowerCase()) ||
+    item.tags?.some(tag => tag.toLowerCase().includes(search.toLowerCase())) ||
+    item.link?.toLowerCase().includes(search.toLowerCase())
+  );
+
+
+
+
   return (
     <div className="w-full p-4">
       {/* Top Buttons */}
       <div className="flex gap-3 justify-end">
+        <div className="relative w-full max-w-sm ">
+          <CiSearch size={20} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-700" />
+          <input 
+            type="search"
+            placeholder="Search..."
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full pl-10 pr-4 py-2 rounded-md border border-gray-600 focus:outline-none focus:ring-0 
+               focus:shadow-[0_0_5px_rgba(150,120,200,0.7)] transition-shadow duration-300"
+          />
+        </div>
+        
         <button
           className="hidden cursor-pointer md:flex items-center gap-2 text-white px-2.5 py-1 bg-slate-700 text-sm rounded-md"
           onClick={() => {
@@ -244,27 +270,32 @@ const Main: React.FC<MainProps> = ({ selectedMenu }) => {
       {/* Scrollable Cards */}
       <div className="h-[calc(100vh-80px)] px-4 overflow-y-auto custom-scrollbar">
         <div className="mt-4">
-          <div
+          {/* <div
             className="grid gap-6 p-4"
             style={{
               gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 300px))',
             }}
-          >
-            {content && content
-            .filter((item) => selectedMenu === 'Show All' || item.contentType === selectedMenu)
-              .map((item) => (
-              <Card
-                key={item._id}
-                title={item.title}
-                link={item.link}
-                tags={item.tags}
-                thumbnail = {item.thumbnailUrl}
-                contentType={item.contentType}
-                onDelete={() => handleDelete(item._id)}
-                onEdit={() => handleEdit(item)}
-              />
-            ))}
-          </div>
+          > */}
+          <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 p-4">
+            {filteredContent.length === 0 ? (
+              <div className="text-gray-500 col-span-full text-center text-lg mt-8">
+                No content found.
+              </div>
+              ) : (
+                filteredContent.map((item) => (
+                  <Card
+                    key={item._id}
+                    title={item.title}
+                    link={item.link}
+                    tags={item.tags}
+                    thumbnail={item.thumbnailUrl}
+                    contentType={item.contentType}
+                    onDelete={() => handleDelete(item._id)}
+                    onEdit={() => handleEdit(item)}
+                  />
+                ))
+              )}
+            </div>
         </div>
       </div>
 

@@ -8,6 +8,7 @@ import 'react-toastify/dist/ReactToastify.css'
 import ProtectedRoute from './pages/ProtectedRoute'
 import Sidebar from './components/Sidebar/Sidebar'
 import Main from './components/Main/main'
+import SharedView from './components/Main/SharedView';
 
 export default function App(){
 
@@ -33,6 +34,7 @@ export default function App(){
           } 
         />
 
+        <Route path="/shared/:token" element={<SharedView />} />
 
         <Route 
           path="/email-verify" 

@@ -23,8 +23,8 @@ interface CardProps {
   link: string;
   contentType: string;
   thumbnail?: string;
-  onDelete: () => void;
-  onEdit: () => void;
+  onDelete?: () => void;
+  onEdit?: () => void;
   tags: string[] | null;
 }
 
@@ -122,14 +122,19 @@ const Card: React.FC<CardProps> = ({
           <div className="flex items-center justify-start w-full">
             {contentTypeIcons[contentType] || <FaLink size={20} />}
           </div>
-
-          <button onClick={onEdit}>
-            <MdOutlineEdit className="text-xl cursor-pointer text-gray-600 hover:text-black" />
-          </button>
-
+            
+          {onEdit && (
+            <button onClick={onEdit}>
+              <MdOutlineEdit className="text-xl cursor-pointer text-gray-600 hover:text-black" />
+            </button>
+          )}
+          
+            
+          { onDelete && (
           <button onClick={() => setShowDeleteModal(true)} className="flex-shrink-0">
             <MdDelete className="text-xl cursor-pointer text-slate-700 hover:text-red-700" />
-          </button>
+          </button>)
+          }     
 
         </div>
       </div>
@@ -149,7 +154,10 @@ const Card: React.FC<CardProps> = ({
         isOpen={showDeleteModal}
         onCancel={() => setShowDeleteModal(false)}
         onConfirm={() => {
-          onDelete();
+          if (onDelete){
+            onDelete();
+          }
+          
           setShowDeleteModal(false);
         }}
       />
