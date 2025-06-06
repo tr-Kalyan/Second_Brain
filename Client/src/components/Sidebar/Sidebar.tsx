@@ -100,7 +100,7 @@ export default function Sidebar({ selectedMenu, setSelectedMenu }:SidebarProps) 
     }, []);
 
     return (
-        <nav className={`shadow-md h-screen p-2 bg-gradient-to-b  from-orange-300 to-gray-500 duration-300 flex flex-col ${open && !isMobile ? 'w-50' : 'w-16'}`}>
+        <nav className={`shadow-md h-screen p-2 bg-gradient-to-t  from-green-100  to-blue-200 duration-300 flex flex-col ${open && !isMobile ? 'w-50' : 'w-16'}`}>
 
             {/* header */}
 

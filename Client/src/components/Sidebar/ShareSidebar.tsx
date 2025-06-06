@@ -5,7 +5,9 @@ import { IoLogoYoutube } from 'react-icons/io';
 import { FaXTwitter } from 'react-icons/fa6';
 import { SiMedium, SiNotion } from 'react-icons/si';
 import { LuBrainCircuit } from "react-icons/lu";
-import {MdMenuOpen} from "react-icons/md"
+import {MdMenuOpen} from "react-icons/md";
+import { useTheme } from '../../context/ThemeContext';
+import { Moon, Sun } from 'lucide-react';
 
 export const menuItems = [
   {
@@ -50,6 +52,7 @@ const ShareSidebar: React.FC<ShareSidebarProps> = ({
 
 const [open,setOpen] = useState(true)
 const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+const { theme, toggleTheme } = useTheme()
 
 useEffect(() => {
         const handleResize = () => {
@@ -114,7 +117,16 @@ useEffect(() => {
                       })
                   }
               </ul>
-  
+              
+              <div className="flex justify-start p-2">
+                <button
+                  onClick={toggleTheme}
+                  className=" cursor-pointer transition "
+                  aria-label="Toggle theme"
+                >
+                  {theme === 'dark' ? <Sun className="w-6 h-6" /> : <Moon className="w-6 h-6" />}
+                </button>
+            </div>
           </nav>
   );
 };

@@ -24,7 +24,7 @@ const ShareModal: React.FC<ShareModalProps> = ({ shareLink, onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-transparent backdrop-blur-sm flex items-center justify-center z-50">
+    <div className="fixed inset-0 z-50 bg-transparent backdrop-blur-sm flex items-center justify-center z-50">
       <div className="relative bg-white rounded-lg p-6 shadow-lg w-[90%] max-w-md">
         {/* Close Icon */}
         <button

@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { FaPlus } from 'react-icons/fa';
+import { FaPlus, FaFilter } from 'react-icons/fa';
 import { IoMdShare, IoMdClose } from 'react-icons/io';
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { CiSearch } from "react-icons/ci";
@@ -9,6 +9,8 @@ import { AppContent } from '../../context/AppContext';
 import { toast } from 'react-toastify';
 import Card from '../CardUI/Card';
 import ShareModal from './ShareModal';
+import { useTheme } from '../../context/ThemeContext';
+import { Moon, Sun } from 'lucide-react'
 
 interface ContentItem {
   _id: string;
@@ -17,6 +19,7 @@ interface ContentItem {
   contentType:string;
   thumbnailUrl?: string;
   tags: string[];
+  createdAt:string;
 }
 
 
@@ -39,6 +42,10 @@ const Main: React.FC<MainProps> = ({ selectedMenu }) => {
   const [shareLink,setShareLink] = useState<string>('');
   const [shareShowModal,setShareShowModal] = useState<boolean>(false);
   const [search,setSearch] = useState<string>('')
+  const { theme, toggleTheme } = useTheme()
+  const [submitting, setSubmitting] = useState(false);
+  const [showFilterPopup, setShowFilterPopup] = useState(false);
+  const [sortOption, setSortOption] = useState<'latest' | 'oldest' | 'title-asc' | 'title-desc'>('latest');
 
   const handleAddTag = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && tagInput.trim() !== '') {
@@ -55,6 +62,9 @@ const Main: React.FC<MainProps> = ({ selectedMenu }) => {
   };
 
   const handleSubmit = async () => {
+
+    if (submitting) return; // prevent double submit
+    setSubmitting(true);
     try {
       if (editMode && editingId) {
         const res = await axios.put(`${backendURL}/api/user/editcontent/${editingId}`, {
@@ -66,6 +76,12 @@ const Main: React.FC<MainProps> = ({ selectedMenu }) => {
 
         if (res.status === 200) {
           toast.success("Content updated successfully");
+
+          setContent( prev => 
+            prev.map(item =>
+              item._id === editingId ? {...item,title,link,tags}:item
+            )
+          )
           setEditMode(false);
           setEditingId(null);
         }
@@ -76,8 +92,14 @@ const Main: React.FC<MainProps> = ({ selectedMenu }) => {
           tags
         },{withCredentials:true});
 
+        //console.log(res)
         if (res.status === 200) {
           toast.success(res.data.message);
+
+          const newItem = res.data.data;
+
+          setContent(prev => [newItem,...prev])
+         
         }
       }
 
@@ -85,10 +107,11 @@ const Main: React.FC<MainProps> = ({ selectedMenu }) => {
       setLink('');
       setTags([]);
       setShowModal(false);
-      await fetchData();
     } catch (err) {
       toast.error("Something went wrong");
       console.log(`Error in handleSubmit:`, err);
+    }finally {
+      setSubmitting(false);
     }
   };
 
@@ -187,22 +210,39 @@ const Main: React.FC<MainProps> = ({ selectedMenu }) => {
 
 
   return (
-    <div className="w-full p-4">
+    <div 
+      className="w-full p-4 "
+      
+      style={{
+        backgroundImage: `
+          radial-gradient(circle at 100% 0%, rgba(83, 219, 29, 0.2) 0%, transparent 50%),
+          radial-gradient(circle at 50% 50%, rgba(29, 149, 219, 0.2) 0%, transparent 50%),
+          radial-gradient(circle at 0% 100%, rgba(23, 43, 75, 0.2) 0%, transparent 50%)
+        `,
+      }}
+    >
       {/* Top Buttons */}
+      
       <div className="flex gap-3 justify-end">
-        <div className="relative w-full max-w-sm ">
-          <CiSearch size={20} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-700" />
-          <input 
+        <div className="relative w-full max-w-sm">
+          <CiSearch
+            size={20}
+            className="absolute left-3 top-1/2 transform -translate-y-1/2 text-red-700 dark:text-red-400"
+          />
+          <input
             type="search"
             placeholder="Search..."
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 rounded-md border border-gray-600 focus:outline-none focus:ring-0 
-               focus:shadow-[0_0_5px_rgba(150,120,200,0.7)] transition-shadow duration-300"
+            className="w-full pl-10 pr-4 py-2 rounded-md dark:text-black border border-gray-100 dark:border-gray-100 
+              bg-white dark:bg-cyan-100 dark:text-slate-900 
+              placeholder:text-gray-400 dark:placeholder:text-slate-900
+              focus:outline-none focus:ring-0 focus:shadow-[0_0_5px_rgba(20,150,0,0.7)] transition-shadow duration-300"
           />
         </div>
+
         
         <button
-          className="hidden cursor-pointer md:flex items-center gap-2 text-white px-2.5 py-1 bg-slate-700 text-sm rounded-md"
+          className="hidden font-semibold cursor-pointer md:flex items-center gap-2 text-white px-2.5 py-1 bg-slate-700 dark:bg-slate-900 text-sm rounded-md"
           onClick={() => {
             setShowModal(true);
             setEditMode(false);
@@ -214,9 +254,18 @@ const Main: React.FC<MainProps> = ({ selectedMenu }) => {
           <FaPlus size={14} /> <span>Add Content</span>
         </button>
 
-        <button onClick={handleShare} className="hidden cursor-pointer md:flex items-center gap-2 text-white px-2.5 py-1 bg-slate-700 rounded-md text-sm">
-          <IoMdShare size={16} /> <span>Share 🧠</span>
+        <button onClick={handleShare} className="hidden font-semibold cursor-pointer md:flex items-center gap-2 text-white px-2.5 py-1 bg-slate-700 dark:bg-slate-900 rounded-md text-sm">
+          <IoMdShare size={16} /> <p >Share </p><span className="ml-1 text-lg"> 🧠</span>
         </button>
+        <div className="flex justify-end">
+          <button
+            onClick={toggleTheme}
+            className=" cursor-pointer transition"
+            aria-label="Toggle theme"
+          >
+            {theme === 'dark' ? <Sun className="w-5 h-5 text-white" /> : <Moon className="w-5 h-5" />}
+          </button>
+        </div>
 
         <div
           onMouseEnter={() => setShowDropdown(true)}
@@ -224,7 +273,7 @@ const Main: React.FC<MainProps> = ({ selectedMenu }) => {
           onClick={() => setShowDropdown(!showDropdown)}
           className="md:hidden relative dropdown-container"
         >
-          <button className="p-2 cursor-pointer">
+          <button className="p-3 cursor-pointer">
             <BsThreeDotsVertical size={20} />
           </button>
 
@@ -239,7 +288,7 @@ const Main: React.FC<MainProps> = ({ selectedMenu }) => {
                   setTags([]);
                   setShowDropdown(false);
                 }}
-                className="w-full flex items-center gap-2 px-4 py-2 hover:bg-gray-100 text-sm"
+                className="w-full flex items-center gap-2 px-4 py-2 cursor-pointer font-semibold hover:bg-gray-100 text-sm"
               >
                 <FaPlus size={14} /> Add Content
               </button>
@@ -247,9 +296,9 @@ const Main: React.FC<MainProps> = ({ selectedMenu }) => {
                 onClick={() => {
                   handleShare()
                   setShowDropdown(false)}}
-                className="w-full flex items-center gap-2 px-4 py-2 hover:bg-gray-100 text-sm"
+                className="w-full flex items-center gap-2 px-4 py-2 cursor-pointer font-semibold hover:bg-gray-100 text-sm"
               >
-                <IoMdShare size={14} /> Share 🧠
+                <IoMdShare size={14} /> <p>Share</p> <span className="text-lg">🧠</span>
               </button>
 
               
@@ -267,6 +316,8 @@ const Main: React.FC<MainProps> = ({ selectedMenu }) => {
             />
       )}
 
+      
+
       {/* Scrollable Cards */}
       <div className="h-[calc(100vh-80px)] px-4 overflow-y-auto custom-scrollbar">
         <div className="mt-4">
@@ -282,7 +333,19 @@ const Main: React.FC<MainProps> = ({ selectedMenu }) => {
                 No content found.
               </div>
               ) : (
-                filteredContent.map((item) => (
+                filteredContent
+                  .sort((a, b) => {
+                    if (sortOption === 'latest') {
+                      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+                    } else if (sortOption === 'oldest') {
+                      return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+                    } else if (sortOption === 'title-asc') {
+                      return a.title.localeCompare(b.title);
+                    } else {
+                      return b.title.localeCompare(a.title);
+                    }
+                  })
+                  .map((item) => (
                   <Card
                     key={item._id}
                     title={item.title}
@@ -292,12 +355,58 @@ const Main: React.FC<MainProps> = ({ selectedMenu }) => {
                     contentType={item.contentType}
                     onDelete={() => handleDelete(item._id)}
                     onEdit={() => handleEdit(item)}
+                    date={item.createdAt}
                   />
                 ))
               )}
             </div>
         </div>
       </div>
+
+
+      {/* Filters */}
+      <div className="fixed bottom-4 right-6 z-50">
+        <div
+          onClick={() => setShowFilterPopup((prev) => !prev)}
+          className="bg-white dark:bg-slate-900 p-2 rounded-full shadow-md cursor-pointer hover:scale-105 transition-transform"
+          title="Sort & Filter"
+        >
+          <FaFilter className="text-slate-900 dark:text-white" />
+        </div>
+
+        {showFilterPopup && (
+          <div className="absolute bottom-14 right-0 bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-700 rounded-lg shadow-lg p-3 w-48 z-50">
+            <p className="text-sm font-semibold mb-2 text-gray-700 dark:text-gray-100">Sort By</p>
+            <ul className="space-y-1">
+              {[
+                { key: 'latest', label: 'Latest to Oldest' },
+                { key: 'oldest', label: 'Oldest to Latest' },
+                { key: 'title-asc', label: 'Title (A-Z)' },
+                { key: 'title-desc', label: 'Title (Z-A)' },
+              ].map((option) => (
+                <li
+                  key={option.key}
+                  className={`cursor-pointer px-2 py-1 rounded-md text-sm
+                    ${sortOption === option.key
+                      ? 'bg-blue-500 text-white font-semibold'
+                      : 'hover:bg-gray-200 dark:hover:bg-slate-600 dark:text-gray-300 text-gray-700'}`}
+                  onClick={() => {
+                    setSortOption(option.key as any);
+                    setShowFilterPopup(false); // Close on selection
+                  }}
+                >
+                  {option.label}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </div>
+
+
+
+
+
 
       {/* Modal */}
       {showModal && (
@@ -357,9 +466,10 @@ const Main: React.FC<MainProps> = ({ selectedMenu }) => {
             {/* Submit Button */}
             <button
               onClick={handleSubmit}
+              disabled={submitting}
               className="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600"
             >
-              {editMode ? 'Update' : 'Submit'}
+              {submitting ? 'Saving...' : editMode ? 'Update' : 'Submit'}
             </button>
           </div>
         </div>

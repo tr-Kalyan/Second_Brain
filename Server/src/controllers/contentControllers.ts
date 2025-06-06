@@ -78,8 +78,7 @@ export const deleteContent = async (req:AuthenticatedRequest,res:Response) => {
         const userid = req.userID;
         const contentId = req.params.contentId;
         
-        console.log("userid =>", userid)
-        console.log("contentid =>", contentId)
+        
 
         if (!userid || !contentId) {
             res.status(400).json({ message: "User ID or Content ID missing" });
@@ -148,17 +147,3 @@ export const editContent = async (req:AuthenticatedRequest,res:Response) => {
 }
 
 
-
-// export const shareContent = async (req:AuthenticatedRequest,res:Response) => {
-//     const {userId} = req.params;
-//     try{
-//         const documents = await userContent.find({userId});
-//         res.status(200).json({data:documents})
-//     }
-//     catch(err){
-
-//         console.log("Something went wrong while sharing",err)
-
-//         res.status(500).json({ message: 'Server error' });
-//     }
-// }

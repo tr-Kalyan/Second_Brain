@@ -7,6 +7,7 @@ import { FaXTwitter } from "react-icons/fa6";
 import { SiMedium, SiNotion } from "react-icons/si";
 import CardModal from "./cardModal";
 import ConfirmDeleteModal from "./DeleteModal";
+import { format } from 'date-fns';
 
 const contentTypeIcons: Record<string, React.ReactNode> = {
   YouTube: <IoLogoYoutube size={20} className="text-red-600" />,
@@ -26,6 +27,7 @@ interface CardProps {
   onDelete?: () => void;
   onEdit?: () => void;
   tags: string[] | null;
+  date?: string;
 }
 
 const Card: React.FC<CardProps> = ({
@@ -35,7 +37,8 @@ const Card: React.FC<CardProps> = ({
   tags,
   onEdit,
   contentType,
-  thumbnail
+  thumbnail,
+  date
 }) => {
   const [showFullTitle, setShowFullTitle] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -43,11 +46,12 @@ const Card: React.FC<CardProps> = ({
 
   return (
     <>
-      <div className="w-full  bg-gradient-to-r from-slate-300 to-gray-300 p-4 rounded-lg shadow-lg relative">
+      <div className="w-full  bg-gradient-to-b from-white to-violet-100 dark:bg-slate-200 p-4 rounded-lg shadow-lg relative">
         {/* Card Header */}
-        <div className="flex justify-between items-start border-b border-gray-800 gap-1 pb-3 mb-3">
+        
+        <div className="flex justify-between items-start  rounded-md gap-1 pb-3 mb-3">
           <div
-            className="relative pr-2 w-[90%]"
+            className="relative pr-2 w-[90%] border-b border-green-900"
             onMouseEnter={() => setShowFullTitle(true)}
             onMouseLeave={() => setShowFullTitle(false)}
             onClick={() => setShowFullTitle(!showFullTitle)}
@@ -69,6 +73,7 @@ const Card: React.FC<CardProps> = ({
           >
             <BiExpand size={20} />
           </div>
+          
         </div>
 
         {/* Thumbnail or Link Placeholder */}
@@ -136,6 +141,13 @@ const Card: React.FC<CardProps> = ({
           </button>)
           }     
 
+        </div>
+        <div>
+          {date && (
+            <p className="text-sm text-red-900 font-light mt-3">
+              Added on: {format(new Date(date), 'dd MMM yyyy')}
+            </p>
+          )}
         </div>
       </div>
 

@@ -25,3 +25,13 @@
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: #555;
 }
+
+
+
+html {
+  @apply bg-white text-black;
+}
+
+html.dark {
+  @apply bg-neutral-700;
+}
