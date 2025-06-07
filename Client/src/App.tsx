@@ -9,6 +9,7 @@ import ProtectedRoute from './pages/ProtectedRoute'
 import Sidebar from './components/Sidebar/Sidebar'
 import Main from './components/Main/main'
 import SharedView from './components/Main/SharedView';
+import Hero from './pages/Hero';
 
 export default function App(){
 
@@ -18,8 +19,13 @@ export default function App(){
       <ToastContainer autoClose={1000} theme="dark" />
       <Routes>
         
+        {/* Hero Page (Landing Page) */}
+        <Route path="/" element={<Hero />} />
+
+        {/* Login page */}
         <Route path="/login" element={<LoginPage />} />
 
+        {/* Protected Dashboard */}
         <Route 
           path="/dashboard" 
           element={
@@ -34,8 +40,10 @@ export default function App(){
           } 
         />
 
+        {/* Shared View */}
         <Route path="/shared/:token" element={<SharedView />} />
 
+        {/* Email Verify */}
         <Route 
           path="/email-verify" 
           element={
@@ -45,7 +53,7 @@ export default function App(){
           } 
         />
 
-
+        {/* Reset Password */}
         <Route path="/reset-password" element={<ResetPassword />} />
       </Routes>
     </div>

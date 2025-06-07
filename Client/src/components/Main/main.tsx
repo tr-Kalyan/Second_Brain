@@ -329,7 +329,7 @@ const Main: React.FC<MainProps> = ({ selectedMenu }) => {
           > */}
           <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 p-4">
             {filteredContent.length === 0 ? (
-              <div className="text-gray-500 col-span-full text-center text-lg mt-8">
+              <div className="text-red-400 col-span-full text-center text-lg mt-8">
                 No content found.
               </div>
               ) : (

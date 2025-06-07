@@ -4,7 +4,7 @@ import {MdMenuOpen} from "react-icons/md"
 import { LuBrainCircuit } from "react-icons/lu";
 import { FaUserCircle,FaFolderOpen, FaLinkedin, FaGithub} from "react-icons/fa";
 import { IoLogoYoutube } from "react-icons/io";
-import { FaXTwitter } from "react-icons/fa6";
+import { FaXTwitter, FaLink } from "react-icons/fa6";
 import { SiMedium,SiNotion } from "react-icons/si";
 
 import { AiOutlineLogout } from "react-icons/ai";
@@ -47,6 +47,10 @@ const menuItems = [
     {
         icons:<FaGithub size={25} />,
         label:'Github'
+    },
+    {
+        icons:<FaLink size={25} />,
+        label:'Website'
     }
 
 ]
@@ -80,7 +84,7 @@ export default function Sidebar({ selectedMenu, setSelectedMenu }:SidebarProps) 
 
     const handleLogout = async () => {
         await logout()
-        navigate('/login')
+        navigate('/')
     }
 
     useEffect(() => {
@@ -167,9 +171,6 @@ export default function Sidebar({ selectedMenu, setSelectedMenu }:SidebarProps) 
                 {/* Name & Email */}
                 <div className={`leading-5 transition-all duration-500 ${!(open && !isMobile) && 'w-0 translate-x-24 overflow-hidden'}`}>
                     <p className="py-1 text-md">{userData?.name ? userData.name.charAt(0).toUpperCase() + userData.name.slice(1).toLowerCase() : ''}</p>
-                    {/* <span className="text-xs block overflow-hidden text-ellipsis whitespace-nowrap max-w-[150px]">
-                    kalyannism@gmail.com
-                    </span> */}
                 </div>
             </div>
         </nav>

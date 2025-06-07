@@ -13,10 +13,11 @@ const contentTypeIcons: Record<string, React.ReactNode> = {
   YouTube: <IoLogoYoutube size={20} className="text-red-600" />,
   Medium: <SiMedium size={20} className="text-black" />,
   Linkedin: <FaLinkedin size={20} className="text-blue-600" />,
-  Link: <FaLink size={20} className="text-purple-600" />,
+  Link: <FaLink size={20} className="text-black" />,
   Github: <FaGithub size={20} />,
   Notion: <SiNotion size={20} />,
-  Twitter: <FaXTwitter size={18} />
+  Twitter: <FaXTwitter size={18} />,
+  Website:<FaLink size={18} className="text-black" />
 };
 
 interface CardProps {
@@ -46,7 +47,7 @@ const Card: React.FC<CardProps> = ({
 
   return (
     <>
-      <div className="w-full  bg-gradient-to-b from-white to-violet-100 dark:bg-slate-200 p-4 rounded-lg shadow-lg relative">
+      <div className="w-full  bg-gradient-to-b from-slate-200 to-black/20 dark:bg-slate-200 p-4 rounded-lg shadow-lg relative">
         {/* Card Header */}
         
         <div className="flex justify-between items-start  rounded-md gap-1 pb-3 mb-3">
