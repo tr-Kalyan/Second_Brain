@@ -116,10 +116,10 @@ export const login = async (req:Request,res:Response): Promise<void>  => {
 
         res.cookie("token",token,{
             httpOnly:true,
-            secure:false,
+            secure:true,
             maxAge:3600000,
             path:'/',
-            sameSite:'lax'
+            sameSite:'none'
         })
 
         res.status(200).json({
