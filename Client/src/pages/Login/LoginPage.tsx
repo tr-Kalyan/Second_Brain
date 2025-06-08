@@ -63,7 +63,7 @@ export const LoginPage = () => {
                 }
             } else {
                 const response = await axios.post(`${backendURL}/api/auth/signin`, {
-                    email,
+                    lowerCaseEmail,
                     password
                 },
                 {

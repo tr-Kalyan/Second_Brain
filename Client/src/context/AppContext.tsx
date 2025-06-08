@@ -78,7 +78,7 @@ export const AppContextProvider = ({children}:{children:ReactNode}) => {
                 withCredentials: true
             });
             
-            console.log("from context", res,res.status);
+            // console.log("from context", res,res.status);
             
             if (res.status === 200 && res.data.userData) {
                 const user = {
