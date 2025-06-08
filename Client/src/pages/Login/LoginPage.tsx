@@ -69,7 +69,7 @@ export const LoginPage = () => {
                 {
                     withCredentials: true}
             );
-                console.log("response from login function login page",response)
+                // console.log("response from login function login page",response)
 
                 if (response.status === 200) {
                     toast.success(response.data.message || "Login successful");
