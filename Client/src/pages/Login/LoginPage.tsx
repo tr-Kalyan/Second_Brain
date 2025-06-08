@@ -42,9 +42,9 @@ export const LoginPage = () => {
 
             if (state === 'Sign Up') {
                 const response = await axios.post(`${backendURL}/api/auth/signup`, {
-                        username,
-                        lowerCaseEmail,
-                        password
+                        username:username,
+                        email:lowerCaseEmail,
+                        passowrd:password
                     },{
                     withCredentials: true}
                 );
@@ -63,8 +63,8 @@ export const LoginPage = () => {
                 }
             } else {
                 const response = await axios.post(`${backendURL}/api/auth/signin`, {
-                    lowerCaseEmail,
-                    password
+                    email:lowerCaseEmail,
+                    password:password
                 },
                 {
                     withCredentials: true}
