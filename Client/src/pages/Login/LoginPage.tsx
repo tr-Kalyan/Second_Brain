@@ -44,7 +44,7 @@ export const LoginPage = () => {
                 const response = await axios.post(`${backendURL}/api/auth/signup`, {
                         username:username,
                         email:lowerCaseEmail,
-                        passowrd:password
+                        password:password
                     },{
                     withCredentials: true}
                 );
