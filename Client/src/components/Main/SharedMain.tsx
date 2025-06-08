@@ -79,10 +79,10 @@ const SharedMain = () => {
             type="search"
             placeholder="Search..."
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 rounded-md dark:text-black border border-gray-100 dark:border-gray-100 
+            className={`w-full pl-10 pr-4 py-2 rounded-md dark:text-black border border-gray-100 dark:border-gray-100 
               bg-white dark:bg-cyan-100 dark:text-slate-900 
-              placeholder:text-gray-400 dark:placeholder:text-slate-900
-              focus:outline-none focus:ring-0 focus:shadow-[0_0_5px_rgba(20,150,0,0.7)] transition-shadow duration-300"
+              ${theme === 'dark' ?"placeholder:text-slate-900": "placeholder:text-gray-400" }
+              focus:outline-none focus:ring-0 focus:shadow-[0_0_5px_rgba(20,150,0,0.7)] transition-shadow duration-300`}
           />
         </div>
       </div>
@@ -104,7 +104,6 @@ const SharedMain = () => {
                 thumbnail={item.thumbnailUrl}
                 contentType={item.contentType}
                 date={item.createdAt}
-                // No edit or delete
               />
             ))
           )}

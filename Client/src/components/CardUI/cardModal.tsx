@@ -16,7 +16,6 @@ const CardModal: React.FC<CardModalProps> = ({
     link,
     thumbnail,
     tags,
-    contentType,
 }) => {
     if (!isOpen) return null;
 
