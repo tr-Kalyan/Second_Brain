@@ -6,16 +6,31 @@ import authRouter from "./routes/authRoutes"
 import pageRouter from './routes/pageRoutes';
 import dbConnect from './config/db';
 
+dotenv.config({path:"../.env"});
+
 const app = express();
 
 app.use(express.json())
+
+const allowedOrigins = process.env.FRONTEND_URL?.split(',');
+
+
+console.log(allowedOrigins)
+
+
 app.use(cors({
-    origin:"http://localhost:5173",
-    credentials:true
-}))
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins?.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true
+}));
 
 app.use(cookieParser())
-dotenv.config({path:"../.env"});
+
 
 dbConnect()
 

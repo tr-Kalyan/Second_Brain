@@ -7,6 +7,9 @@ import userContent from "../models/contentModel";
 
 dotenv.config({path:'../.env'})
 
+const frontendUrls = process.env.FRONTEND_URL?.split(',');
+const frontendUrl = frontendUrls?.[1] || frontendUrls?.[0]; 
+
 export const generateShareLink = async(req:AuthenticatedRequest,res:Response) => {
 
     const userId = req.userID;
@@ -24,7 +27,7 @@ export const generateShareLink = async(req:AuthenticatedRequest,res:Response) =>
 
 
         res.status(201).json({
-            shareLink:`${process.env.FRONTEND_URL}/shared/${token}` 
+            shareLink:`${frontendUrl}/shared/${token}` 
         })
     }
     catch(err){
