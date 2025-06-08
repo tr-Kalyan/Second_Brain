@@ -42,10 +42,12 @@ export const LoginPage = () => {
 
             if (state === 'Sign Up') {
                 const response = await axios.post(`${backendURL}/api/auth/signup`, {
-                    username,
-                    lowerCaseEmail,
-                    password
-                });
+                        username,
+                        lowerCaseEmail,
+                        password
+                    },{
+                    withCredentials: true}
+                );
 
                 if (response.data.status === 201) {
                     toast.success(response.data.message);
@@ -63,7 +65,10 @@ export const LoginPage = () => {
                 const response = await axios.post(`${backendURL}/api/auth/signin`, {
                     email,
                     password
-                });
+                },
+                {
+                    withCredentials: true}
+            );
                 console.log("response from login function login page",response)
 
                 if (response.status === 200) {
