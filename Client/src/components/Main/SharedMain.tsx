@@ -16,7 +16,12 @@ interface SharedContentItem {
   thumbnailUrl?: string;
 }
 
-const SharedMain = () => {
+
+type SharedMainProps = {
+  selectedMenu: string;
+};
+
+const SharedMain:React.FC<SharedMainProps> = ({ selectedMenu })=> {
   const { token } = useParams();
   const [sharedData, setSharedData] = useState<SharedContentItem[]>([]);
   const [search, setSearch] = useState('');
@@ -36,10 +41,17 @@ const SharedMain = () => {
   };
 
   useEffect(() => {
-    fetchSharedContent();
-  }, []);
+    if (token){
+      fetchSharedContent();
+    }
+    
+  }, [token]);
 
   const filteredContent = sharedData
+    .filter((item) => {
+      if (selectedMenu === 'All') return true;
+      return item.contentType === selectedMenu;
+    })
     .filter((item) =>
       item.title.toLowerCase().includes(search.toLowerCase()) ||
       item.tags?.some(tag => tag.toLowerCase().includes(search.toLowerCase())) ||
