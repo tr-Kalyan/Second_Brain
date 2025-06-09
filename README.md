@@ -99,13 +99,13 @@ JWT_KEY=your-jwt-secret
 SMTP_USER=your-smtp-user
 SMTP_PASS=your-smtp-password
 SENDER_EMAIL=you@example.com
-FRONTEND_URL=https://secondbrain.netlify.app
+FRONTEND_URL=https://secondbrain1.netlify.app
 ```
 
 
 
 ## 🌍 Live Demo
-Check it out here 👉 secondbrain.netlify.app
+Check it out here 👉 [secondbrain.netlify.app](https://secondbrain1.netlify.app/)
 
 
 ## 🧠 Notes
