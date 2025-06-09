@@ -16,7 +16,7 @@ const SharedView: React.FC = () => {
             selectedMenu={selectedMenu}
             setSelectedMenu={setSelectedMenu}
           />
-          <SharedMain />
+          <SharedMain selectedMenu={selectedMenu}/>
        </ThemeProvider>
       
     </div>
