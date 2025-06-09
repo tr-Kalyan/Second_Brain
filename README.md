@@ -60,7 +60,7 @@ https://secondbrain.netlify.app/shared/5c8ec64c-e9d4-456e-a86b-a37b341b8d7e
 
 
 ##  📦 Setup Locally
-
+```bash
 git clone https://github.com/your-username/second-brain.git
 cd second-brain
 
