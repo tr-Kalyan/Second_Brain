@@ -2,7 +2,7 @@
 import {useState, useEffect} from 'react';
 import { FaFolderOpen, FaLinkedin, FaGithub } from 'react-icons/fa';
 import { IoLogoYoutube } from 'react-icons/io';
-import { FaXTwitter } from 'react-icons/fa6';
+import { FaXTwitter, FaLink  } from 'react-icons/fa6';
 import { SiMedium, SiNotion } from 'react-icons/si';
 import { LuBrainCircuit } from "react-icons/lu";
 import {MdMenuOpen} from "react-icons/md";
@@ -37,6 +37,10 @@ export const menuItems = [
   {
     icons: <FaGithub size={24} />,
     label: 'Github'
+  },
+  {
+    icons:<FaLink size={25} />,
+    label:'Website'
   }
 ];
 

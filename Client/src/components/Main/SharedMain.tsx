@@ -49,7 +49,7 @@ const SharedMain:React.FC<SharedMainProps> = ({ selectedMenu })=> {
 
   const filteredContent = sharedData
     .filter((item) => {
-      if (selectedMenu === 'All') return true;
+      if (selectedMenu === 'Show All') return true;
       return item.contentType === selectedMenu;
     })
     .filter((item) =>
