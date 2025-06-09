@@ -121,7 +121,7 @@ const Main: React.FC<MainProps> = ({ selectedMenu }) => {
       const res = await axios.post(`${backendURL}/api/user/generate-share-link`,{},{
         withCredentials:true,
       });
-      console.log("from handleShare",res)
+      //console.log("from handleShare",res)
       if (res.status === 201){
         const link = res.data.shareLink;
 
